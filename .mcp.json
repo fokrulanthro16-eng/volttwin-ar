@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "lens-studio": {
+      "command": "lens-studio",
+      "args": ["--project", "volttwin-ar.esproj"]
+    }
+  }
+}

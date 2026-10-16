@@ -1,0 +1,12 @@
+{
+  "appVersion": {
+    "major": 5,
+    "minor": 24,
+    "patch": 0,
+    "build": 0
+  },
+  "deviceType": "Spectacles",
+  "projectType": "Spectacles",
+  "studioVersion": "5.24.0",
+  "projectName": "VoltTwin AR v2.0"
+}
