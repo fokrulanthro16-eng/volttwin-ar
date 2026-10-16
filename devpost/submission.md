@@ -86,21 +86,21 @@ Designing for optical see-through AR glasses requires fundamentally different th
 ---
 
 ### 🎬 Official Devpost Demo Video (`demo-submission.mp4`)
-* **Format:** 1920x1080 (1080p), 60 FPS, H.264 High Profile, AAC Stereo.
-* **Duration:** Exactly 02:35 (155.0 seconds).
-* **Audio Track:** Full binaural soundtrack with Windows SAPI neural-cadence narration, 60Hz/120Hz transformer hum with acoustic occlusion filtering, volumetric plasma arc crackle burst, and padlock latch chime.
+* **Format:** 1920x1080 (1080p), 60 FPS, H.264 High Profile, AAC 48kHz Stereo.
+* **Duration:** Exactly 01:51.58 (111.58 seconds).
+* **Audio Track:** Studio Neural Voice Master (`en-US-ChristopherNeural` at rate `-10%`) composited with 60Hz/120Hz transformer hum acoustic occlusion, volumetric plasma arc crackle burst, and metallic padlock latch chime.
 * **High-Resolution Thumbnails:**
-  * `thumbnail_exploded.jpg` (Frame 01:22): 3D Exploded-View exposing internal busbars and $68^\circ\text{C}$ amber conduits.
-  * `thumbnail_tagout.jpg` (Frame 02:00): Emerald LOTO compliance state with glowing padlock and `LOTO-HASH-994A` tag.
+  * `thumbnail_exploded.jpg` (Frame 01:02): 3D Exploded-View exposing internal busbars and $68^\circ\text{C}$ amber conduits.
+  * `thumbnail_tagout.jpg` (Frame 01:40): Emerald LOTO compliance state with glowing digital padlock and `LOTO-HASH-994A` tag.
 
 #### Exact Video Sequence & Narration Breakdown:
 | Timestamp | Sequence | Narration Focus & Actions |
 | :--- | :--- | :--- |
-| `0:00 - 0:25` | **Hook & Waveguide Thesis** | Optical see-through thesis: sharing view, 1:1 scale, hands-free. WebGL viewport initializes with 1m Arc-Flash perimeter ring. |
-| `0:25 - 0:50` | **Core Stack (CLAD + Lens Studio MCP + TS)** | Architecture overview: deterministic FSM, SIK integration, NFPA 70E compliance calculations, waveguide additive color rules. |
-| `0:50 - 1:15` | **Three.js Engine & Hazard Breach** | Optical CV tracking lock on HV-402 (99.4% confidence). Hand proximity slider breaches 15cm; triggers crimson strobe warning and volumetric plasma spark particle blast. |
-| `0:15 - 1:40` | **3D Exploded-View & Web Audio Occlusion** | Voice command *"Explode View"* smoothly expands cabinet modules (+25cm); exposes $68^\circ\text{C}$ thermal load conduits; dynamic biquad audio filter unmasks 60Hz transformer hum (-12dB to 0dB). |
-| `1:40 - 2:05` | **Hands-Free LOTO & Gaze-Dwell Interlock** | Voice command *"Toggle B2"* isolates circuit; thermal conduits cool to $21^\circ\text{C}$ cryo-blue; 1.5s gaze-dwell reticle locks on Terminal T1 (0.0V verified); 3D digital padlock latches with metallic chime. |
-| `2:05 - 2:25` | **LEAF 12/12 Verification & Audit Log Export** | Viewport pans down across the 12 automated LEAF test badges (100% passing); triggers HUD click to export cryptographic JSON audit report (`LOTO-HASH-994A.json`). |
-| `2:25 - 2:35` | **Heroic Sign-off & 3D Spatial Orbit** | Dramatic camera orbit around safe emerald-green cabinet; closing call to action for Snap SPECS spatial computing in industrial safety. |
+| `00:00 - 00:17.38` | **State 1: Calibration & CV Lock** | Optical see-through thesis: sharing view, 1:1 metric scale, hands-free. Real-time computer vision scans room and locks onto Panel #HV-402 with 99.4% confidence. |
+| `00:17.38 - 00:29.92` | **State 2: Live Arc-Flash Hazard** | Pulsing crimson 3D hazard cage and 1-meter floor perimeter ring appear. Conduits glow amber-hot at $68^\circ\text{C}$ representing live Joule heating under heavy electrical load. |
+| `00:29.92 - 00:44.66` | **Proximity Breach & Plasma Arc Blast** | 3D technician hand controller encroaches within 15 cm of live conductors; waveguide triggers crimson strobe alarm alongside a volumetric electrical arc plasma spark burst with realistic high-voltage crackle audio. |
+| `00:44.66 - 00:54.99` | **State 3: Hands-Free Mechanical Isolation** | Hands-free speech command: *"Toggle B2"*. Breaker B2 isolates without physical touch, power particles turn amber warning of residual capacitor charge. |
+| `00:54.99 - 01:12.44` | **3D Exploded-View & Audio Occlusion** | Speech command: *"Explode View"* smoothly expands cabinet modules outward (+25cm / +15cm) in 3D world space. Spatial acoustic occlusion unmasks raw 60Hz transformer hum from -12dB to 0dB. |
+| `01:12.44 - 01:31.82` | **State 4: Gaze Dwell & Ghost Probes** | Technician locks head-gaze on Terminal T1 for 1.5 continuous seconds (radial reticle progress). Translucent 3D ghost multimeter probes align at 45° as voltage discharges `480V -> 180V -> 42V -> 0.0V (VERIFIED SAFE)`. Conduits cool to $21^\circ\text{C}$ cryo-blue. |
+| `01:31.82 - 01:51.58` | **State 5: Emerald Padlock & Audit Export** | All perimeters turn emerald green, glowing digital padlock snaps over breaker with authoritative metallic latch, transformer hum silences, cryptographic audit certificate (`LOTO-HASH-994A.json`) automatically exports, followed by heroic spatial orbit and full 12/12 passing LEAF test verification! |
 
