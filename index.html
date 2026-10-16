@@ -297,8 +297,11 @@
           <i class="fa-solid fa-volume-high animate-pulse"></i>
         </div>
         <div class="flex-1">
-          <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">NARRATOR & SPECS SPATIAL AUDIO</div>
-          <div id="narratorText" class="text-xs font-sans text-slate-200 font-medium">Ready. Click "▶ Auto-Play Judge Demo" or click "Next Step" to start.</div>
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">NARRATOR & SPECS SPATIAL AUDIO</span>
+            <span id="activeVoiceBadge" class="text-[9px] px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-800/60 text-cyan-300 font-mono flex items-center gap-1.5"><i class="fa-solid fa-microphone-lines text-cyan-400"></i> HD Voice: Resolving...</span>
+          </div>
+          <div id="narratorText" class="text-xs font-sans text-slate-200 font-medium mt-0.5">Ready. Click "▶ Auto-Play Judge Demo" or click "Next Step" to start.</div>
         </div>
       </div>
 
@@ -648,20 +651,130 @@
       speakNarrator("Cryptographic LOTO audit certificate LOTO-HASH-994A exported successfully.");
     }
 
+    // --- High-Definition Voice Synthesis Engine ---
+    let preferredHDVoice = null;
+
+    function resolveHDVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices || voices.length === 0) return null;
+
+      // Filter for English voices
+      const enVoices = voices.filter(v => v.lang && (v.lang.toLowerCase().startsWith('en') || v.lang.replace('_', '-').toLowerCase().startsWith('en-')));
+
+      // Priority 1: Top Natural / Neural high-definition voices
+      const priorityPatterns = [
+        /Microsoft Christopher Online \(Natural\)/i,
+        /Microsoft Jenny Online \(Natural\)/i,
+        /Microsoft Guy Online \(Natural\)/i,
+        /Microsoft Aria Online \(Natural\)/i,
+        /Google US English/i,
+        /Microsoft Eric Online \(Natural\)/i,
+        /Microsoft Steffan Online \(Natural\)/i,
+        /Microsoft Michelle Online \(Natural\)/i,
+        /Samantha \(Enhanced\)/i,
+        /Siri/i,
+        /Natural/i,
+        /Neural/i
+      ];
+
+      for (const pattern of priorityPatterns) {
+        const match = enVoices.find(v => pattern.test(v.name));
+        if (match) return match;
+      }
+
+      // Priority 2: Any English voice with "Google"
+      const googleVoice = enVoices.find(v => /google/i.test(v.name));
+      if (googleVoice) return googleVoice;
+
+      // Priority 3: Standard en-US
+      const enUsVoice = enVoices.find(v => v.lang === 'en-US' || v.lang === 'en_US');
+      if (enUsVoice) return enUsVoice;
+
+      // Priority 4: Any English voice
+      if (enVoices.length > 0) return enVoices[0];
+
+      // Fallback: Default system voice
+      return voices.find(v => v.default) || voices[0];
+    }
+
+    function updateActiveVoiceBadge() {
+      const badge = document.getElementById('activeVoiceBadge');
+      if (!badge) return;
+      if (preferredHDVoice) {
+        const cleanName = preferredHDVoice.name.replace(/Microsoft |Online |\(Natural\)|\(United States\)/gi, '').trim();
+        badge.innerHTML = `<i class="fa-solid fa-microphone-lines text-cyan-400"></i> HD Voice: <span class="text-white">${cleanName || preferredHDVoice.name}</span>`;
+      } else {
+        badge.innerHTML = `<i class="fa-solid fa-microphone text-slate-400"></i> Voice: System Default (en-US)`;
+      }
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        preferredHDVoice = resolveHDVoice();
+        updateActiveVoiceBadge();
+      };
+      preferredHDVoice = resolveHDVoice();
+      setTimeout(() => {
+        if (!preferredHDVoice) preferredHDVoice = resolveHDVoice();
+        updateActiveVoiceBadge();
+      }, 250);
+    }
+
     // --- Speech Synthesis Narrator ---
     function speakNarrator(text, onComplete) {
       document.getElementById('narratorText').innerText = text;
       if (!('speechSynthesis' in window)) {
-        if (onComplete) setTimeout(onComplete, 2000);
+        if (onComplete) setTimeout(onComplete, 1800);
         return;
       }
+
+      // Cancel previous utterance to prevent overlapping queue
       window.speechSynthesis.cancel();
+
+      // Ensure voice is populated
+      if (!preferredHDVoice) {
+        preferredHDVoice = resolveHDVoice();
+        updateActiveVoiceBadge();
+      }
+
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.05;
+
+      // 1. Unhurried, natural studio cadence (0.89) & clear pitch (1.0)
+      utterance.rate = 0.89;
       utterance.pitch = 1.0;
-      utterance.onend = () => { if (onComplete) onComplete(); };
-      utterance.onerror = () => { if (onComplete) onComplete(); };
-      window.speechSynthesis.speak(utterance);
+
+      // 2. High-Definition Voice assignment
+      if (preferredHDVoice) {
+        utterance.voice = preferredHDVoice;
+        utterance.lang = preferredHDVoice.lang;
+      } else {
+        utterance.lang = 'en-US';
+      }
+
+      // 3. Clear 300ms - 500ms audio pause between sections for smooth 3D visual sync
+      const pauseDurationMs = 420;
+      let completed = false;
+      const finish = () => {
+        if (completed) return;
+        completed = true;
+        if (onComplete) {
+          setTimeout(onComplete, pauseDurationMs);
+        }
+      };
+
+      utterance.onend = finish;
+      utterance.onerror = finish;
+
+      // Chromium speech dispatch safety delay
+      setTimeout(() => {
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn("[VoltTwin Speech] Speech synthesis error:", e);
+          finish();
+        }
+      }, 25);
     }
 
     // --- Three.js Scene Setup ---
@@ -1426,42 +1539,46 @@
       // Step 1: Calibration & CV Lock
       currentState = 1;
       renderState();
-      await new Promise(r => speakNarrator("Welcome to VoltTwin AR v2.0 for Snap SPECS glasses. In State 1, real-time computer vision scans the room and locks onto Panel HV-402 with 99.4% confidence.", () => setTimeout(r, 600)));
+      await new Promise(r => speakNarrator("Welcome to VoltTwin AR v2.0 for Snap SPECS glasses. In State 1, real-time computer vision scans the room and locks onto Panel HV-402 with 99.4% confidence.", r));
 
       // Step 2: Live Arc-Flash & Plasma Blast Demo
       currentState = 2;
       renderState();
-      await new Promise(r => speakNarrator("State 2: A pulsing crimson hazard cage and 1-meter floor perimeter ring appear. Conduits glow amber-hot at 68 degrees Celsius.", () => setTimeout(r, 500)));
+      await new Promise(r => speakNarrator("State 2: A pulsing crimson hazard cage and 1-meter floor perimeter ring appear. Conduits glow amber-hot at 68 degrees Celsius.", r));
 
       // Simulate technician hand moving into 10cm danger zone
       document.getElementById('proximitySlider').value = 10;
       updateProximity(10);
-      await new Promise(r => speakNarrator("Warning! The proximity interlock detects the technician hand entering 15 centimeters. Watch the volumetric plasma spark burst and high-voltage acoustic discharge!", () => setTimeout(r, 1000)));
+      await new Promise(r => speakNarrator("Warning! The proximity interlock detects the technician hand entering 15 centimeters. Watch the volumetric plasma spark burst and high-voltage acoustic discharge!", r));
 
-      // Retract hand safely
+      // Retract hand safely & natural visual pause
       document.getElementById('proximitySlider').value = 30;
       updateProximity(30);
+      await new Promise(res => setTimeout(res, 450));
 
       // Step 3: Mechanical Isolation & 3D Exploded View
       currentState = 3;
       renderState();
-      await new Promise(r => speakNarrator("State 3: The technician issues hands-free speech command: Toggle B2. Breaker B2 isolates.", () => setTimeout(r, 500)));
+      await new Promise(r => speakNarrator("State 3: The technician issues hands-free speech command: Toggle B2. Breaker B2 isolates.", r));
 
       // Demonstrate 3D Exploded View & Acoustic Hum Occlusion Unmasking
       toggleExplodedView();
-      await new Promise(r => speakNarrator("The technician says 'Explode View', expanding 3D cabinet modules outward. Notice spatial acoustic occlusion unmasking the raw 60 Hertz transformer hum from -12dB to full unattenuated volume.", () => setTimeout(r, 1400)));
+      await new Promise(r => speakNarrator("The technician says 'Explode View', expanding 3D cabinet modules outward. Notice spatial acoustic occlusion unmasking the raw 60 Hertz transformer hum from -12dB to full unattenuated volume.", r));
+      await new Promise(res => setTimeout(res, 450));
       toggleExplodedView();
+      await new Promise(res => setTimeout(res, 450));
 
       // Step 4: Gaze Dwell & Ghost Probe Zero-Energy Verification
       currentState = 4;
       renderState();
-      await new Promise(r => speakNarrator("State 4: OSHA zero-energy verification. The technician locks head-gaze on Terminal T1 for 1.5 seconds. Translucent 3D ghost probes align at 45 degrees as voltage drops to zero point zero volts.", () => setTimeout(r, 1000)));
+      await new Promise(r => speakNarrator("State 4: OSHA zero-energy verification. The technician locks head-gaze on Terminal T1 for 1.5 seconds. Translucent 3D ghost probes align at 45 degrees as voltage drops to zero point zero volts.", r));
+      await new Promise(res => setTimeout(res, 450));
 
       // Step 5: Immutable Cryptographic Tagout & Audit Log Export
       currentState = 5;
       renderState();
       exportAuditLogJson();
-      await new Promise(r => speakNarrator("State 5: Tagout complete! All perimeters turn emerald green, a glowing digital padlock snaps over the breaker, electrical hum is silenced, and cryptographic audit log LOTO-HASH-994A is automatically exported. Safe to work!", () => setTimeout(r, 1400)));
+      await new Promise(r => speakNarrator("State 5: Tagout complete! All perimeters turn emerald green, a glowing digital padlock snaps over the breaker, electrical hum is silenced, and cryptographic audit log LOTO-HASH-994A is automatically exported. Safe to work!", r));
 
       btn.classList.remove('opacity-75');
       btn.innerHTML = `<i class="fa-solid fa-play"></i> ▶ Re-Play Judge Demo`;
