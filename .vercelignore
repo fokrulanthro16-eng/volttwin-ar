@@ -1,0 +1,9 @@
+node_modules
+raw_recordings
+audio_output/studio_segments
+*.webm
+*.tmp
+.git
+venv
+__pycache__
+tests

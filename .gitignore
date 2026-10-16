@@ -40,3 +40,5 @@ Thumbs.db
 !assets/devpost/*.png
 !thumbnail_exploded.jpg
 !thumbnail_tagout.jpg
+
+.vercel

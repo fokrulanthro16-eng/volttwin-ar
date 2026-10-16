@@ -4,6 +4,8 @@
 ### Enterprise Hands-Free High-Voltage Panel & Server Rack Lockout-Tagout (LOTO) Spatial Copilot for Snap SPECS AR Glasses
 
 [![Hackathon Submission](https://img.shields.io/badge/Devpost-Learn%20AR%20with%20SPECS-FFFC00?style=for-the-badge&logo=snapchat&logoColor=black)](https://devpost.com)
+[![Live Demo (Vercel)](https://img.shields.io/badge/Live%20Simulator-Vercel%20Production-00E5FF?style=for-the-badge&logo=vercel&logoColor=white)](https://volttwin-ar.vercel.app)
+[![Live Mirror (GitHub Pages)](https://img.shields.io/badge/Live%20Mirror-GitHub%20Pages-22C55E?style=for-the-badge&logo=githubpages&logoColor=white)](https://fokrulanthro16-eng.github.io/volttwin-ar/)
 [![LEAF Verification](https://img.shields.io/badge/LEAF%20Tests-12%2F12%20PASSING%20(100%25)-00E676?style=for-the-badge&logo=checkmarx&logoColor=white)](#-leaf-automated-verification-matrix-12-of-12-passing)
 [![Platform](https://img.shields.io/badge/Platform-Snap%20SPECS%20%7C%20Lens%20Studio%205.24+-00E5FF?style=for-the-badge&logo=snapchat&logoColor=black)](#)
 [![Stack](https://img.shields.io/badge/Stack-TypeScript%20%7C%20CLAD%20%7C%20MCP%20%7C%20Three.js-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](#)
@@ -15,8 +17,11 @@
   <img src="thumbnail_exploded.jpg" alt="VoltTwin AR v2.0 Demo Video on YouTube" width="900" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"/>
 </a>
 
-### 🎬 **[Watch the Full 1080p60 YouTube Demo Video (Click Here)](https://youtu.be/9FeNQ1GQqfs)**
+### 🎬 **[Watch the Full 1080p60 YouTube Demo Video](https://youtu.be/9FeNQ1GQqfs)**
 *Narrated with Studio Neural Speech (`en-US-ChristopherNeural -10%`), Web Audio 60Hz hum acoustic occlusion, plasma arc blast, and metallic padlock latch chime.*
+
+### 🌐 **[Test the Live Interactive 3D Spatial AR Simulator (Vercel)](https://volttwin-ar.vercel.app)** &bull; **[GitHub Pages Backup Mirror](https://fokrulanthro16-eng.github.io/volttwin-ar/)**
+*Run the full 3D WebGL simulator with live webcam pass-through, exploded cabinet inspection, and the one-click judge auto-play directly in your browser.*
 
 </div>
 
@@ -218,9 +223,20 @@ Every functional requirement and Done Criterion is continuously validated via th
 
 ---
 
-## 🚀 Quick Start & Local Reproduction
+## 🚀 Quick Start & Live Deployments
 
-You can run the complete automated test suite and launch the interactive 3D spatial web simulator in under 60 seconds:
+### 🌐 Test the Live Public Simulator Directly in Your Browser (Zero Setup)
+Judges can test the interactive 3D spatial simulation instantly with zero installation:
+- **Primary Production (Vercel):** [https://volttwin-ar.vercel.app](https://volttwin-ar.vercel.app)
+- **High-Availability Backup (GitHub Pages):** [https://fokrulanthro16-eng.github.io/volttwin-ar/](https://fokrulanthro16-eng.github.io/volttwin-ar/)
+
+Click **`▶ AUTO-PLAY JUDGE DEMO (STUDIO NEURAL MP3)`** on the live site to run the complete automated walkthrough synchronized with high-definition neural speech, spatial acoustic occlusion, and 3D visual transitions.
+
+---
+
+### 💻 Local Reproduction
+
+You can run the complete automated test suite and launch the interactive 3D spatial web simulator locally in under 60 seconds:
 
 ### 1. Clone the Repository
 ```bash

@@ -390,7 +390,7 @@
             <button onclick="showDoc('arch')" id="tabArch" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">Architecture</button>
             <button onclick="showDoc('sub')" id="tabSub" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition">Devpost Submission</button>
           </div>
-          <a href="/devpost/design-brief.md" target="_blank" class="text-[11px] text-cyan-400 hover:underline flex items-center gap-1 font-mono">
+          <a href="./devpost/design-brief.md" target="_blank" class="text-[11px] text-cyan-400 hover:underline flex items-center gap-1 font-mono">
             <i class="fa-solid fa-arrow-up-right-from-square"></i> Raw
           </a>
         </div>
@@ -455,16 +455,16 @@
 
         <!-- Quick Links to Source Files -->
         <div class="border-t border-slate-800 pt-3 mt-3 grid grid-cols-2 gap-2 text-[11px] font-mono">
-          <a href="/src/VoltTwinStateController.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
+          <a href="./src/VoltTwinStateController.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
             <span>StateController.ts</span> <i class="fa-solid fa-code text-cyan-400"></i>
           </a>
-          <a href="/src/SpatialObjectDetection.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
+          <a href="./src/SpatialObjectDetection.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
             <span>ObjectDetection.ts</span> <i class="fa-solid fa-bullseye text-emerald-400"></i>
           </a>
-          <a href="/src/ExplodedViewController.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
+          <a href="./src/ExplodedViewController.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
             <span>ExplodedView.ts</span> <i class="fa-solid fa-layer-group text-amber-400"></i>
           </a>
-          <a href="/src/RemoteSupervisorTelemetry.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
+          <a href="./src/RemoteSupervisorTelemetry.ts" target="_blank" class="p-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 transition flex items-center justify-between">
             <span>RemoteTelemetry.ts</span> <i class="fa-solid fa-tower-broadcast text-rose-400"></i>
           </a>
         </div>
@@ -475,8 +475,8 @@
 
   <!-- HTML5 Studio Neural Audio Element -->
   <audio id="studioDemoAudio" preload="auto" class="hidden">
-    <source src="public/demo-narration.mp3" type="audio/mpeg">
-    <source src="demo-narration.mp3" type="audio/mpeg">
+    <source src="./public/demo-narration.mp3" type="audio/mpeg">
+    <source src="./demo-narration.mp3" type="audio/mpeg">
   </audio>
 
   <!-- Three.js 3D Spatial Simulator Implementation -->
@@ -1654,13 +1654,13 @@
       if (!studioDemoAudio) {
         studioDemoAudio = document.getElementById('studioDemoAudio');
         if (!studioDemoAudio) {
-          studioDemoAudio = new Audio('public/demo-narration.mp3');
+          studioDemoAudio = new Audio('./public/demo-narration.mp3');
           studioDemoAudio.id = 'studioDemoAudio';
         }
         studioDemoAudio.preload = 'auto';
         studioDemoAudio.onerror = () => {
           if (studioDemoAudio.src.includes('public/')) {
-            studioDemoAudio.src = 'demo-narration.mp3';
+            studioDemoAudio.src = './demo-narration.mp3';
           }
         };
       }
