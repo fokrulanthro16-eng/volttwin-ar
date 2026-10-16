@@ -1,0 +1,75 @@
+{
+  "voice": "en-US-ChristopherNeural",
+  "rate": "-10%",
+  "totalDuration": 111.52,
+  "cues": [
+    {
+      "id": 1,
+      "title": "State 1: Calibration & Optical CV Lock",
+      "action": "state_1_init",
+      "startTime": 0.0,
+      "endTime": 16.58,
+      "duration": 16.58,
+      "text": "Welcome to VoltTwin AR v2.0 for Snap SPECS glasses. In State 1, real-time computer vision scans the room and locks onto Panel HV-402 with 99.4% confidence.",
+      "state": 1
+    },
+    {
+      "id": 2,
+      "title": "State 2: Live Arc-Flash Hazard & 68\u00b0C Thermal Conduits",
+      "action": "state_2_hazard",
+      "startTime": 17.38,
+      "endTime": 29.12,
+      "duration": 11.74,
+      "text": "State 2: A pulsing crimson hazard cage and 1-meter floor perimeter ring appear. Conduits glow amber-hot at 68 degrees Celsius.",
+      "state": 2
+    },
+    {
+      "id": 3,
+      "title": "Proximity Warning & Plasma Arc Blast",
+      "action": "proximity_breach",
+      "startTime": 29.92,
+      "endTime": 43.46,
+      "duration": 13.54,
+      "text": "Warning! The proximity interlock detects the technician hand entering 15 centimeters. Watch the volumetric plasma spark burst and high-voltage acoustic discharge!"
+    },
+    {
+      "id": 4,
+      "title": "State 3: Hands-Free Mechanical Isolation",
+      "action": "state_3_isolation",
+      "startTime": 44.66,
+      "endTime": 54.19,
+      "duration": 9.53,
+      "text": "State 3: The technician issues hands-free speech command: Toggle B2. Breaker B2 isolates.",
+      "state": 3
+    },
+    {
+      "id": 5,
+      "title": "3D Exploded-View & Audio Occlusion Unmasking",
+      "action": "explode_view",
+      "startTime": 54.99,
+      "endTime": 71.24,
+      "duration": 16.25,
+      "text": "The technician says 'Explode View', expanding 3D cabinet modules outward. Notice spatial acoustic occlusion unmasking the raw 60 Hertz transformer hum from -12dB to full unattenuated volume."
+    },
+    {
+      "id": 6,
+      "title": "State 4: Gaze Dwell & Ghost Probe Zero-Energy Verification",
+      "action": "state_4_verification",
+      "startTime": 72.44,
+      "endTime": 90.82,
+      "duration": 18.38,
+      "text": "State 4: OSHA zero-energy verification. The technician locks head-gaze on Terminal T1 for 1.5 seconds. Translucent 3D ghost probes align at 45 degrees as voltage drops to zero point zero volts.",
+      "state": 4
+    },
+    {
+      "id": 7,
+      "title": "State 5: Immutable Cryptographic Tagout & Audit Export",
+      "action": "state_5_tagout",
+      "startTime": 91.82,
+      "endTime": 111.52,
+      "duration": 19.7,
+      "text": "State 5: Tagout complete! All perimeters turn emerald green, a glowing digital padlock snaps over the breaker, electrical hum is silenced, and cryptographic audit log LOTO-HASH-994A is automatically exported. Safe to work!",
+      "state": 5
+    }
+  ]
+}

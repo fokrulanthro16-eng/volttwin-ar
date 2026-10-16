@@ -3,6 +3,7 @@ node_modules/
 
 # Intermediate recordings
 raw_recordings/
+audio_output/studio_segments/
 
 # Python cache
 __pycache__/
