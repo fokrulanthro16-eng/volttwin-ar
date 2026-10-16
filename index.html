@@ -227,6 +227,13 @@
               <span>HUM OCCLUSION:</span>
               <span id="occlusionText" class="font-bold">OCCLUDED (-12dB / 180Hz)</span>
             </div>
+
+            <!-- Dynamic Thermal Telemetry Badge (Feature 4) -->
+            <div id="thermalBadge" class="bg-slate-950/85 backdrop-blur border border-amber-800 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-amber-300 w-fit">
+              <i class="fa-solid fa-temperature-high text-amber-400"></i>
+              <span>THERMAL LOAD:</span>
+              <span id="thermalText" class="font-bold text-amber-400">AMBIENT (21°C • READY)</span>
+            </div>
           </div>
 
           <!-- 3D Coordinate Indicator -->
@@ -1309,6 +1316,10 @@
         });
 
         nextBtn.innerHTML = `<span>Sync Twin</span> <i class="fa-solid fa-arrow-right"></i>`;
+        const thermalText = document.getElementById('thermalText');
+        const thermalBadge = document.getElementById('thermalBadge');
+        if (thermalText) thermalText.innerText = 'AMBIENT (21°C • READY)';
+        if (thermalBadge) thermalBadge.className = 'bg-slate-950/85 backdrop-blur border border-slate-700 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-slate-300 w-fit';
       } 
       else if (currentState === 2) {
         statusBadge.innerText = 'STATE 2: LIVE_ARC_FLASH_SHIELD';
@@ -1317,6 +1328,11 @@
         pillSub.innerText = '1.0m Arc-Flash boundary active. Hand proximity armed.';
         lidarBtn.classList.add('hidden');
         cvOverlay.classList.add('hidden');
+
+        const thermalText = document.getElementById('thermalText');
+        const thermalBadge = document.getElementById('thermalBadge');
+        if (thermalText) thermalText.innerText = '68°C (AMBER-HOT JOULE HEATING)';
+        if (thermalBadge) thermalBadge.className = 'bg-slate-950/85 backdrop-blur border border-red-700 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-red-300 w-fit';
 
         hazardCageMesh.visible = true;
         floorRingMesh.visible = true;
@@ -1341,6 +1357,11 @@
         lidarBtn.classList.add('hidden');
         cvOverlay.classList.add('hidden');
 
+        const thermalText = document.getElementById('thermalText');
+        const thermalBadge = document.getElementById('thermalBadge');
+        if (thermalText) thermalText.innerText = '45°C (RESIDUAL CAPACITOR CHARGE)';
+        if (thermalBadge) thermalBadge.className = 'bg-slate-950/85 backdrop-blur border border-amber-700 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-amber-300 w-fit';
+
         hazardCageMesh.visible = true;
         floorRingMesh.visible = true;
         floorRingMesh.material.color.setHex(0xffb300);
@@ -1364,6 +1385,11 @@
         pillSub.innerText = 'Lock gaze on Terminal T1 for 1.5s. Probes aligned at 45°.';
         lidarBtn.classList.add('hidden');
         cvOverlay.classList.add('hidden');
+
+        const thermalText = document.getElementById('thermalText');
+        const thermalBadge = document.getElementById('thermalBadge');
+        if (thermalText) thermalText.innerText = '21°C (CRYODOWN COMPLETE • SAFE)';
+        if (thermalBadge) thermalBadge.className = 'bg-slate-950/85 backdrop-blur border border-cyan-700 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-cyan-300 w-fit';
 
         hazardCageMesh.visible = false;
         floorRingMesh.visible = false;
@@ -1390,6 +1416,11 @@
         pillSub.innerText = 'LOTO-HASH-994A Verified • Digital Padlock Engaged';
         lidarBtn.classList.add('hidden');
         cvOverlay.classList.add('hidden');
+
+        const thermalText = document.getElementById('thermalText');
+        const thermalBadge = document.getElementById('thermalBadge');
+        if (thermalText) thermalText.innerText = '21°C (DE-ENERGIZED • 0.0V SAFE)';
+        if (thermalBadge) thermalBadge.className = 'bg-slate-950/85 backdrop-blur border border-emerald-700 rounded-lg px-3 py-1.5 shadow-lg flex items-center gap-2 text-[10px] font-mono text-emerald-300 w-fit';
 
         hazardCageMesh.visible = false;
         floorRingMesh.visible = true;

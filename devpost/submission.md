@@ -104,3 +104,19 @@ Designing for optical see-through AR glasses requires fundamentally different th
 | `01:12.44 - 01:31.82` | **State 4: Gaze Dwell & Ghost Probes** | Technician locks head-gaze on Terminal T1 for 1.5 continuous seconds (radial reticle progress). Translucent 3D ghost multimeter probes align at 45° as voltage discharges `480V -> 180V -> 42V -> 0.0V (VERIFIED SAFE)`. Conduits cool to $21^\circ\text{C}$ cryo-blue. |
 | `01:31.82 - 01:51.58` | **State 5: Emerald Padlock & Audit Export** | All perimeters turn emerald green, glowing digital padlock snaps over breaker with authoritative metallic latch, transformer hum silences, cryptographic audit certificate (`LOTO-HASH-994A.json`) automatically exports, followed by heroic spatial orbit and full 12/12 passing LEAF test verification! |
 
+---
+
+### 📸 Devpost Submission Image Gallery (High-DPI 1080p)
+
+The following 6 high-definition cinematic screenshots are saved in `screenshots/` and `assets/devpost/` ready to upload to Devpost:
+
+| Image File | Description & Spatial Features Shown |
+| :--- | :--- |
+| **`screenshot-1-spatial-anchor.png`** | **Spatial Twin Anchor & Optical CV Lock (99.4%):** Live pass-through simulated factory view with green YOLO optical tracking bounding box, laser scan line, and 1:1 metric 1.0m NFPA 70E floor Arc-Flash perimeter ring. |
+| **`screenshot-2-proximity-breach.png`** | **Arc-Flash Plasma Blast Hazard Breach (<15cm):** 3D ghost hand encroaching inside the 15cm danger zone, triggering the flashing crimson HUD strobe warning, volumetric plasma spark burst, and acoustic alarm. |
+| **`screenshot-3-exploded-view.png`** | **3D Exploded-View Architecture & Audio Occlusion:** Voice command *"Explode View"* disassembles cabinet doors and modules outward (+25cm), exposing internal 480V copper busbars, wiring conduits, and unmasked acoustic occlusion (-12dB to 0dB). |
+| **`screenshot-4-thermal-load.png`** | **Dynamic GLSL Thermal Load Shaders ($68^\circ\text{C}$ Joule Heating):** Close-up thermodynamic visualization of live conduits under load ($68^\circ\text{C}$ amber-hot) with real-time temperature telemetry overlay. |
+| **`screenshot-5-loto-padlock.png`** | **Immutable Cryptographic Padlock & Gaze-Dwell Verified:** Glowing emerald 3D digital padlock locked over isolated Breaker B2, verified 1.5s gaze-dwell lock reticle on Terminal T1 ($0.0\text{V}$ safe), and minted compliance badge `LOTO-HASH-994A`. |
+| **`screenshot-6-leaf-tests-pass.png`** | **LEAF Automated Test Matrix (12 of 12 PASSING):** Complete overview of the passing automated test suite (LEAF-01 through LEAF-12), remote safety engineer telemetry HUD, and the one-click *"Export Audit Log (JSON)"* button. |
+
+
