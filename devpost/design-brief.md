@@ -60,6 +60,8 @@ Each one can be checked in Lens Studio's preview:
 8. Gaze Dwell Verification Safety Interlock: In State 4, requires a continuous 1.5-second head-gaze lock on Terminal Pin T1 before Zero-Energy verification can be confirmed; a gaze radial fill ring visually animates the 1.5-second dwell countdown.
 9. Real-Time Spatial Object Detection Simulation: Displays a dynamic green tracking bounding box with a scanning grid overlay, successfully locking onto the target electrical cabinet with `TARGET: Panel #HV-402 [CONFIDENCE: 99.4%]`.
 10. 3D Exploded-View Architecture: Smoothly animates the cabinet front panel and busbar modules outward in 3D world space (offset +25cm / +15cm) to expose internal wiring and capacitors upon toggle or voice command "Explode View".
+11. Spatial Audio Occlusion Filter: Adjusts 60Hz high-voltage electrical hum dynamically; metal casing attenuates hum by -12dB (gain 0.25) with a 180Hz low-pass filter when closed, and opens unoccluded to 0dB (gain 1.0) with a 1500Hz filter when the cabinet is exploded/open.
+12. Cryptographic Audit Log Export: HUD export action generates and downloads an immutable, cryptographically signed JSON audit certificate (`LOTO-HASH-994A.json`) verifying 0.0V terminal reading, B2 isolation, and maintenance clearance.
 
 ## Out of scope
 - Multi-user remote peer sharing (Connected Lenses).

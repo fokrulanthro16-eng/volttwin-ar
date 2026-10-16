@@ -11,6 +11,7 @@ import { GazeDwellInterlock } from "./GazeDwellInterlock";
 import { SpatialObjectDetection } from "./SpatialObjectDetection";
 import { ExplodedViewController } from "./ExplodedViewController";
 import { RemoteSupervisorTelemetry } from "./RemoteSupervisorTelemetry";
+import { AudioOcclusionController } from "./AudioOcclusionController";
 
 /**
  * VoltTwinStateController.ts
@@ -53,6 +54,9 @@ export class VoltTwinStateController extends BaseScriptComponent {
 
     @input
     remoteSupervisor: RemoteSupervisorTelemetry;
+
+    @input
+    audioOcclusionController: AudioOcclusionController;
 
     @input
     stateInstructionPill: SceneObject;

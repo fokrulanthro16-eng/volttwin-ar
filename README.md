@@ -70,11 +70,12 @@ volttwin-ar/
 │   ├── GazeDwellInterlock.ts          # 1.5-Second Head-Gaze Lock Safety Interlock on T1
 │   ├── SpatialObjectDetection.ts      # Optical CV Tracking Box & 99.4% Confidence Lock
 │   ├── ExplodedViewController.ts      # 3D Exploded-View Architecture & Module Expansion
+│   ├── AudioOcclusionController.ts    # Spatial Acoustic Occlusion Filter (-12dB / 180Hz)
 │   ├── RemoteSupervisorTelemetry.ts   # Live Expert Hologram & Audio Waveform HUD
 │   └── SimulatedPanelHardware.ts      # Virtual Panel Stand-In for Instant Preview Testing
 ├── tests/                             # Automated Test Verification Framework
 │   ├── leaf_runtime_mock.ts           # Lens Studio & LEAF Runtime Simulation Engine
-│   └── run_leaf_tests.ts              # Executable LEAF Automated Test Suite (10 Scenarios)
+│   └── run_leaf_tests.ts              # Executable LEAF Automated Test Suite (12 Scenarios)
 ├── .agents/skills/plan-lens/          # Installed Devpost Hackathon Skill Pack
 ├── volttwin-ar.esproj                 # Lens Studio Spectacles Project Descriptor
 ├── .mcp.json                          # Lens Studio MCP Server Configuration
@@ -83,7 +84,7 @@ volttwin-ar/
 
 ---
 
-## 🧪 Automated Testing with LEAF (10 of 10 Scenarios Passing)
+## 🧪 Automated Testing with LEAF (12 of 12 Scenarios Passing)
 Run the automated test suite locally:
 ```bash
 npx tsx tests/run_leaf_tests.ts
@@ -99,4 +100,6 @@ npx tsx tests/run_leaf_tests.ts
 * `LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on Terminal Pin T1)` -> **PASS**
 * `LEAF-09: Real-Time Spatial Object Detection Simulation (99.4% confidence lock)` -> **PASS**
 * `LEAF-10: 3D Exploded-View Architecture (+25cm / +15cm module expansion)` -> **PASS**
-* `LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on Terminal Pin T1)` -> **PASS**
+* `LEAF-11: Spatial Audio Occlusion Filter (-12dB / 0.25 Closed vs 0dB / 1.0 Exploded)` -> **PASS**
+* `LEAF-12: Cryptographic Audit Log Export (LOTO-HASH-994A Certificate JSON)` -> **PASS**
+

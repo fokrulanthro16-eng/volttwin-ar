@@ -12,6 +12,8 @@
  *   LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on T1)
  *   LEAF-09: Real-Time Spatial Object Detection Simulation (99.4% confidence lock)
  *   LEAF-10: 3D Exploded-View Architecture (+25cm / +15cm expansion)
+ *   LEAF-11: Spatial Audio Occlusion Filter (-12dB / 0.25 Closed vs 0dB / 1.0 Exploded)
+ *   LEAF-12: Cryptographic Audit Log Export (LOTO-HASH-994A Certificate JSON)
  */
 
 import {
@@ -36,6 +38,7 @@ import { GazeDwellInterlock } from "../src/GazeDwellInterlock.ts";
 import { SpatialObjectDetection } from "../src/SpatialObjectDetection.ts";
 import { ExplodedViewController } from "../src/ExplodedViewController.ts";
 import { RemoteSupervisorTelemetry } from "../src/RemoteSupervisorTelemetry.ts";
+import { AudioOcclusionController } from "../src/AudioOcclusionController.ts";
 
 // Set up Scene Hierarchy
 const sceneObjects = new Map<string, MockSceneObject>();
@@ -168,6 +171,10 @@ function createScene(): LEAFContext {
     remoteSupervisor.linkStatusText = { text: "" } as any;
     remoteSupervisor.onAwake();
 
+    const audioOcclusionController = new AudioOcclusionController();
+    audioOcclusionController.explodedController = explodedController;
+    audioOcclusionController.onAwake();
+
     const stateController = new VoltTwinStateController();
     stateController.spatialCalibration = spatialCalibration;
     stateController.safetyShield = safetyShield;
@@ -181,6 +188,7 @@ function createScene(): LEAFContext {
     stateController.objectDetection = objectDetection;
     stateController.explodedController = explodedController;
     stateController.remoteSupervisor = remoteSupervisor;
+    stateController.audioOcclusionController = audioOcclusionController;
     stateController.stateInstructionPill = instructionPill as any;
     stateController.stateInstructionText = { text: "" } as any;
     stateController.onAwake();
@@ -203,6 +211,7 @@ function createScene(): LEAFContext {
     components.set("SpatialObjectDetection", objectDetection);
     components.set("ExplodedViewController", explodedController);
     components.set("RemoteSupervisorTelemetry", remoteSupervisor);
+    components.set("AudioOcclusionController", audioOcclusionController);
     components.set("VoltTwinStateController", stateController);
     components.set("VoiceCommandDispatcher", voiceDispatcher);
 
@@ -235,6 +244,7 @@ function createScene(): LEAFContext {
                 (gazeInterlock as any).triggerEvent("UpdateEvent");
                 (objectDetection as any).triggerEvent("UpdateEvent");
                 (explodedController as any).triggerEvent("UpdateEvent");
+                (audioOcclusionController as any).triggerEvent("UpdateEvent");
             }
         }
     };
@@ -442,6 +452,54 @@ async function runAllTests() {
         });
     });
 
+    // LEAF-11: Spatial Audio Occlusion Filter
+    leaf.describe("LEAF-11: Spatial Audio Occlusion Filter", () => {
+        leaf.it("LEAF-11: Spatial Audio Occlusion Filter (-12dB / 0.25 Closed vs 0dB / 1.0 Exploded)", async (ctx) => {
+            const audioOcclusion = ctx.findComponent("AudioOcclusionController");
+            const explodedController = ctx.findComponent("ExplodedViewController");
+
+            // Closed cabinet state
+            explodedController.setExploded(false);
+            await ctx.wait(1000);
+            leaf.expect(explodedController.isExploded).toBe(false);
+            leaf.expect(audioOcclusion.calculateOcclusionGain(false)).toBeCloseTo(0.25, 0.01);
+            leaf.expect(audioOcclusion.calculateCutoffHz(false)).toBe(180);
+            leaf.expect(audioOcclusion.currentGain).toBeCloseTo(0.25, 0.05);
+
+            // Explode cabinet -> unmasks raw hum
+            explodedController.setExploded(true);
+            await ctx.wait(1000);
+            leaf.expect(explodedController.isExploded).toBe(true);
+            leaf.expect(audioOcclusion.calculateOcclusionGain(true)).toBeCloseTo(1.0, 0.01);
+            leaf.expect(audioOcclusion.calculateCutoffHz(true)).toBe(1500);
+            leaf.expect(audioOcclusion.currentGain).toBeCloseTo(1.0, 0.05);
+        });
+    });
+
+    // LEAF-12: Cryptographic Audit Log Export
+    leaf.describe("LEAF-12: Cryptographic Audit Log Export", () => {
+        leaf.it("LEAF-12: Cryptographic Audit Log JSON Generation & LOTO-HASH-994A Integrity", async (ctx) => {
+            const stateCtrl = ctx.findComponent("VoltTwinStateController");
+            const tagout = ctx.findComponent("CryptographicTagout");
+
+            stateCtrl.setState(LOTOState.CRYPTOGRAPHIC_TAGOUT);
+            leaf.expect(tagout.isPadlockLocked).toBe(true);
+
+            const jsonString = tagout.exportAuditLogJson();
+            leaf.expect(typeof jsonString).toBe("string");
+
+            const audit = JSON.parse(jsonString);
+            leaf.expect(audit.cryptographicHash).toBe("LOTO-HASH-994A");
+            leaf.expect(audit.status).toBe("CLEARED_FOR_MAINTENANCE");
+            leaf.expect(audit.panelId).toBe("HV-402");
+            leaf.expect(audit.safetyVerification.voltageVerified).toBe(0.0);
+            leaf.expect(audit.safetyVerification.mechanicalBreakerB2).toBe("OPEN_ISOLATED");
+            leaf.expect(audit.safetyVerification.gazeInterlockSatisfied).toBe(true);
+            leaf.expect(audit.hardwareTarget.device).toBe("Snap SPECS AR Glasses");
+            leaf.expect(audit.hardwareTarget.confidenceScore).toBeCloseTo(0.994, 0.005);
+        });
+    });
+
     // Execute Tests
     let passCount = 0;
     let failCount = 0;
@@ -462,7 +520,7 @@ async function runAllTests() {
     console.log("--------------------------------------------------------------------------------");
 
     if (failCount === 0) {
-        console.log("🎉 ALL 10 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
+        console.log("🎉 ALL 12 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
     } else {
         process.exit(1);
     }

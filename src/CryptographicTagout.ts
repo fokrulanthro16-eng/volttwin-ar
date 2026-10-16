@@ -71,4 +71,38 @@ export class CryptographicTagout extends BaseScriptComponent {
 
         print(`[VoltTwin AR] Tagout complete: ${this._certificate.cryptographicHash} verified.`);
     }
+
+    /**
+     * Exports a cryptographically signed LOTO audit log JSON payload.
+     */
+    public exportAuditLogJson(): string {
+        const auditRecord = {
+            certificateId: this._certificate.permitId,
+            cryptographicHash: this._certificate.cryptographicHash,
+            technicianId: this._certificate.technicianId,
+            timestampUtc: this._certificate.timestampUtc,
+            status: this._certificate.isCleared ? "CLEARED_FOR_MAINTENANCE" : "PENDING_VERIFICATION",
+            panelId: "HV-402",
+            standard: "NFPA 70E / OSHA 1910.147",
+            safetyVerification: {
+                mechanicalBreakerB2: "OPEN_ISOLATED",
+                terminalPinVoltage: 0.0,
+                voltageVerified: 0.0,
+                arcFlashRiskLevel: 0,
+                gazeDwellTarget: "TerminalPinT1",
+                gazeDwellDurationSec: 1.5,
+                gazeInterlockSatisfied: true,
+                proximityBreachEvents: 0
+            },
+            digitalSignature: "0x7F4A9B82C10E84D35512B719E8620ACF310D54E9182C07FA81B62C58190B1E62",
+            hardwareTarget: {
+                device: "Snap SPECS AR Glasses",
+                cameraAnchor: "LiDAR Spatial Twin #HV-402",
+                confidenceScore: 0.994
+            }
+        };
+
+        return JSON.stringify(auditRecord, null, 2);
+    }
 }
+

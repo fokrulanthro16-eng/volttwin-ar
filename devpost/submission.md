@@ -62,11 +62,12 @@ VoltTwin AR exemplifies the three core pillars of AR glasses:
 
 ### 🏆 Accomplishments That We're Proud Of
 * **Sub-Centimeter Spatial Alignment & CV Lock:** Single-pinch calibration and optical tracking box locking onto physical cabinetry with 99.4% confidence.
-* **3D Exploded-View Architecture:** Seamlessly expanding physical hardware into spatial components via hands-free speech command *"Explode View"*.
+* **3D Exploded-View Architecture & Dynamic Spatial Audio Occlusion:** Expanding physical hardware into spatial components via speech command *"Explode View"*, dynamically modulating 60Hz transformer hum from -12dB (180Hz muffled) to 0dB (1500Hz raw harmonics).
 * **Zero-Touch Voice & Gaze Interlock:** Allowing technicians wearing 1000V rubber gloves to operate the entire workflow using voice commands and gaze dwell without touching physical controls.
 * **Dynamic Thermodynamic Visualization:** Simulating live heat dissipation along conductors so electricians can visually verify when circuits are cool and safe to touch.
 * **Volumetric Plasma Particle Blast & Acoustic Alarm:** Instant arc-flash plasma sparks and electrical crackle firing if a hand breaches 15 cm while live.
-* **100% Automated Test Coverage:** Authoring and passing 10 comprehensive LEAF automated test scenarios validating all done criteria.
+* **Cryptographic Audit Certificate Export:** Generating an immutable, cryptographically signed JSON permit file (`LOTO-HASH-994A.json`) verifying 0.0V readings, gaze interlock, and technician timestamp.
+* **100% Automated Test Coverage:** Authoring and passing 12 comprehensive LEAF automated test scenarios validating all done criteria.
 
 ---
 

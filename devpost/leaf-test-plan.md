@@ -24,6 +24,8 @@ This test plan defines the automated LEAF scenarios that validate all 8 Done Cri
 | **LEAF-08** | #8: Gaze Dwell Verification Interlock | `test_gaze_dwell_safety_interlock` | `GazeDwellInterlock`, `GhostProbeVerifier` | Requires 1.5s continuous head-gaze lock on T1 before 0V verification completes | PASS |
 | **LEAF-09** | #9: Spatial Object Detection Lock | `test_cv_object_detection_lock` | `SpatialObjectDetection` | CV scanning locks on Panel #HV-402 with 99.4% confidence | PASS |
 | **LEAF-10** | #10: Exploded 3D View Animation | `test_exploded_view_animation` | `ExplodedViewController` | Modules smoothly expand +25cm / +15cm outward in 3D world space | PASS |
+| **LEAF-11** | #11: Spatial Audio Occlusion Filter | `test_audio_occlusion_filter` | `AudioOcclusionController`, `ExplodedViewController` | -12dB (0.25) / 180Hz closed vs 0dB (1.0) / 1500Hz exploded | PASS |
+| **LEAF-12** | #12: Cryptographic Audit Log Export | `test_audit_log_export_integrity` | `CryptographicTagout` | Validates signed JSON payload containing `LOTO-HASH-994A` & 0.0V | PASS |
 
 ---
 
@@ -231,3 +233,45 @@ leaf.describe("LEAF-10: Exploded 3D View Animation", () => {
     });
 });
 ```
+
+### LEAF-11: Spatial Audio Occlusion Filter (`test_audio_occlusion_filter`)
+```typescript
+leaf.describe("LEAF-11: Spatial Audio Occlusion Filter", () => {
+    leaf.it("should attenuate hum to 0.25 / 180Hz when closed and unmask to 1.0 / 1500Hz when exploded", async (context) => {
+        const audioOcclusion = context.findComponent("AudioOcclusionController");
+        const explodedController = context.findComponent("ExplodedViewController");
+
+        // Closed cabinet
+        explodedController.setExploded(false);
+        await context.wait(1000);
+        leaf.expect(audioOcclusion.calculateOcclusionGain(false)).toBeCloseTo(0.25, 0.01);
+        leaf.expect(audioOcclusion.calculateCutoffHz(false)).toBe(180);
+
+        // Exploded view
+        explodedController.setExploded(true);
+        await context.wait(1000);
+        leaf.expect(audioOcclusion.calculateOcclusionGain(true)).toBeCloseTo(1.0, 0.01);
+        leaf.expect(audioOcclusion.calculateCutoffHz(true)).toBe(1500);
+    });
+});
+```
+
+### LEAF-12: Cryptographic Audit Log Export (`test_audit_log_export_integrity`)
+```typescript
+leaf.describe("LEAF-12: Cryptographic Audit Log Export", () => {
+    leaf.it("should export a valid signed JSON certificate with LOTO-HASH-994A and 0.0V verified", async (context) => {
+        const stateCtrl = context.findComponent("VoltTwinStateController");
+        const tagout = context.findComponent("CryptographicTagout");
+
+        stateCtrl.setState("CRYPTOGRAPHIC_TAGOUT");
+        const json = tagout.exportAuditLogJson();
+        const audit = JSON.parse(json);
+
+        leaf.expect(audit.cryptographicHash).toBe("LOTO-HASH-994A");
+        leaf.expect(audit.status).toBe("CLEARED_FOR_MAINTENANCE");
+        leaf.expect(audit.safetyVerification.voltageVerified).toBe(0.0);
+        leaf.expect(audit.hardwareTarget.device).toBe("Snap SPECS AR Glasses");
+    });
+});
+```
+

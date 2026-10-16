@@ -169,3 +169,41 @@ To eliminate accidental single-pinch misfires during hazardous electrical testin
 ## 8. Volumetric Plasma Particle Blast & Remote Expert HUD
 * **Arc-Flash Plasma Spark Blast:** Breaching $\le 15\text{ cm}$ in State 2 unleashes dynamic 3D plasma spark particles accompanied by Web Audio synthesized electrical crackle sound.
 * **Encrypted Remote Telemetry:** Waveguide HUD displays live supervisor communication waveform: `REMOTE EXPERT: ENG-SARAH-CHEN | ENCRYPTED 5G LINK (12ms)`.
+
+---
+
+## 9. Spatial Audio Occlusion Filter Architecture
+* **Acoustic Physics Model:** Standard industrial steel switchgear attenuates airborne acoustic pressure by $\sim 12\text{ dB}$ ($G_{\text{closed}} = 0.25$) and absorbs higher-order harmonics through a low-pass filter ($f_{\text{cutoff}} = 180\text{ Hz}$).
+* **Unoccluded State:** When cabinet modules are exploded outward via 3D kinematics or voice command, the internal transformers and 480V busbars are physically exposed:
+  * Gain transitions smoothly from $0.25 \to 1.0$ ($0\text{ dB}$).
+  * Low-pass filter cutoff opens from $180\text{ Hz} \to 1500\text{ Hz}$, unmasking the harsh raw 60Hz fundamental + 120Hz/240Hz harmonics.
+
+---
+
+## 10. Cryptographic Audit Log & LiDAR Room Surface Mesh
+* **LiDAR Spatial Reconstruction:** In live camera pass-through mode, a subtle holographic cyan scanning grid projects onto floor surfaces, visualizing SPECS surface plane detection and anchoring geometry.
+* **Audit Certificate Export (`LOTO-HASH-994A`):**
+  * One-click export downloads cryptographically signed JSON compliance proof:
+    ```json
+    {
+      "certificateId": "PERMIT-HV-402-A",
+      "cryptographicHash": "LOTO-HASH-994A",
+      "technicianId": "TECH-SPECS-01",
+      "timestampUtc": "2026-10-16 14:50 UTC",
+      "status": "CLEARED_FOR_MAINTENANCE",
+      "panelId": "HV-402",
+      "standard": "NFPA 70E / OSHA 1910.147",
+      "safetyVerification": {
+        "mechanicalBreakerB2": "OPEN_ISOLATED",
+        "terminalPinVoltage": 0.0,
+        "voltageVerified": 0.0,
+        "gazeInterlockSatisfied": true
+      },
+      "hardwareTarget": {
+        "device": "Snap SPECS AR Glasses",
+        "cameraAnchor": "LiDAR Spatial Twin #HV-402",
+        "confidenceScore": 0.994
+      }
+    }
+    ```
+
