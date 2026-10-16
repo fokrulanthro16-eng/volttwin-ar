@@ -1,13 +1,42 @@
+# ==============================================================================
+# VoltTwin AR v2.0 - Git Ignore Configuration
+# ==============================================================================
+
 # Dependencies
 node_modules/
+package-lock.json.bak
 
-# Intermediate recordings
+# Intermediate Raw Recordings & Video Stems (>50MB)
 raw_recordings/
 audio_output/studio_segments/
+*.webm
+*.tmp
 
-# Python cache
+# Python Cache & Virtual Environments
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+venv/
+.env
 
-# Local server logs
+# Local Server & Build Artifacts
 .serve/
+dist/
+build/
+*.log
+
+# OS & IDE Metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Ensure Media Assets & Deliverables Are Tracked
+!public/demo-narration.mp3
+!demo-narration.mp3
+!public/demo-narration.json
+!screenshots/*.png
+!assets/devpost/*.png
+!thumbnail_exploded.jpg
+!thumbnail_tagout.jpg
