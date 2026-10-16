@@ -1,6 +1,15 @@
 /**
  * run_leaf_tests.ts
  * Executes the complete LEAF automated test suite for VoltTwin AR v2.0.
+ * Validates all 8 Done Criteria:
+ *   LEAF-01: Spatial Twin Sync (Calibration & 90cm Anchor)
+ *   LEAF-02: Live Arc-Flash Hazard & 15cm Hand Proximity Breach
+ *   LEAF-03: Guided Mechanical Isolation (Breaker B2 Toggle & Residual Amber Flow)
+ *   LEAF-04: Ghost-Probe Zero-Energy Verification (T1-T2 480V -> 0.0V Discharge)
+ *   LEAF-05: Immutable Cryptographic Tagout (Glowing Padlock & LOTO-HASH-994A)
+ *   LEAF-06: Hands-Free Voice Commands ("Check Status", "Toggle B2", "Lockout Complete")
+ *   LEAF-07: Dynamic Heatmap & Thermal Load Overlay (Amber-hot 68°C to Cold-blue 21°C)
+ *   LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on T1)
  */
 
 import {
@@ -19,6 +28,9 @@ import { GhostProbeVerifier } from "../src/GhostProbeVerifier.ts";
 import { CryptographicTagout } from "../src/CryptographicTagout.ts";
 import { SimulatedPanelHardware } from "../src/SimulatedPanelHardware.ts";
 import { VoltTwinStateController } from "../src/VoltTwinStateController.ts";
+import { VoiceCommandDispatcher } from "../src/VoiceCommandDispatcher.ts";
+import { ThermalHeatmapOverlay } from "../src/ThermalHeatmapOverlay.ts";
+import { GazeDwellInterlock } from "../src/GazeDwellInterlock.ts";
 
 // Set up Scene Hierarchy
 const sceneObjects = new Map<string, MockSceneObject>();
@@ -41,6 +53,8 @@ function createScene(): LEAFContext {
     const digitalPadlock = new MockSceneObject("DigitalPadlock");
     const complianceBadge = new MockSceneObject("ComplianceBadge");
     const instructionPill = new MockSceneObject("InstructionPill");
+    const gazeRadialRing = new MockSceneObject("GazeRadialRing");
+    const terminalPinT1 = new MockSceneObject("TerminalPinT1");
 
     sceneObjects.set("PanelAnchor", panelAnchor);
     sceneObjects.set("LidarGrid", lidarGrid);
@@ -58,13 +72,16 @@ function createScene(): LEAFContext {
     sceneObjects.set("DigitalPadlock", digitalPadlock);
     sceneObjects.set("ComplianceBadge", complianceBadge);
     sceneObjects.set("InstructionPill", instructionPill);
+    sceneObjects.set("GazeRadialRing", gazeRadialRing);
+    sceneObjects.set("TerminalPinT1", terminalPinT1);
 
     // Initial transforms
     panelAnchor.getTransform().setWorldPosition(new MockVec3(0, 0, 0));
     hazardCage.getTransform().setWorldPosition(new MockVec3(0, 12, -85));
     handTrackingAnchor.getTransform().setWorldPosition(new MockVec3(50, 0, -50)); // Safely away initially
+    terminalPinT1.getTransform().setWorldPosition(new MockVec3(14, -18, -85));
 
-    // Instantiate Components
+    // Instantiate Subsystems
     const spatialCalibration = new SpatialCalibration();
     spatialCalibration.panelAnchorObject = panelAnchor as any;
     spatialCalibration.lidarGridObject = lidarGrid as any;
@@ -87,11 +104,21 @@ function createScene(): LEAFContext {
     const powerFlowXRay = new PowerFlowXRay();
     powerFlowXRay.onAwake();
 
+    const thermalOverlay = new ThermalHeatmapOverlay();
+    thermalOverlay.conduitTargetObject = new MockSceneObject("ConduitMesh");
+    thermalOverlay.onAwake();
+
+    const gazeInterlock = new GazeDwellInterlock();
+    gazeInterlock.terminalT1Target = terminalPinT1 as any;
+    gazeInterlock.gazeRadialRingObject = gazeRadialRing as any;
+    gazeInterlock.onAwake();
+
     const ghostProbeVerifier = new GhostProbeVerifier();
     ghostProbeVerifier.redProbeObject = redProbe as any;
     ghostProbeVerifier.blackProbeObject = blackProbe as any;
     ghostProbeVerifier.voltageDisplayPillObject = voltagePill as any;
     ghostProbeVerifier.voltageTextComponent = { text: "" } as any;
+    ghostProbeVerifier.gazeInterlock = gazeInterlock;
     ghostProbeVerifier.onAwake();
 
     const cryptographicTagout = new CryptographicTagout();
@@ -112,18 +139,28 @@ function createScene(): LEAFContext {
     stateController.ghostProbeVerifier = ghostProbeVerifier;
     stateController.cryptographicTagout = cryptographicTagout;
     stateController.panelHardware = panelHardware;
+    stateController.thermalOverlay = thermalOverlay;
+    stateController.gazeInterlock = gazeInterlock;
     stateController.stateInstructionPill = instructionPill as any;
     stateController.stateInstructionText = { text: "" } as any;
     stateController.onAwake();
+
+    const voiceDispatcher = new VoiceCommandDispatcher();
+    voiceDispatcher.stateController = stateController;
+    voiceDispatcher.panelHardware = panelHardware;
+    voiceDispatcher.onAwake();
 
     components.set("SpatialCalibration", spatialCalibration);
     components.set("ArcFlashSafetyShield", safetyShield);
     components.set("ProximitySensor", proximitySensor);
     components.set("PowerFlowXRay", powerFlowXRay);
+    components.set("ThermalHeatmapOverlay", thermalOverlay);
+    components.set("GazeDwellInterlock", gazeInterlock);
     components.set("GhostProbeVerifier", ghostProbeVerifier);
     components.set("CryptographicTagout", cryptographicTagout);
     components.set("SimulatedPanelHardware", panelHardware);
     components.set("VoltTwinStateController", stateController);
+    components.set("VoiceCommandDispatcher", voiceDispatcher);
 
     return {
         findSceneObject: (name: string) => sceneObjects.get(name)!,
@@ -136,6 +173,7 @@ function createScene(): LEAFContext {
                     panelHardware.toggleBreakerB2();
                     if (!panelHardware.isBreakerB2Closed) {
                         powerFlowXRay.setMode(PowerFlowMode.RESIDUAL_AMBER);
+                        thermalOverlay.setElectricalLoad(180.0, true);
                     }
                 }
             },
@@ -146,10 +184,11 @@ function createScene(): LEAFContext {
             }
         },
         wait: async (ms: number) => {
-            // Fast-forward simulated delta updates
             const steps = Math.max(1, Math.floor(ms / 16));
             for (let i = 0; i < steps; i++) {
                 (ghostProbeVerifier as any).triggerEvent("UpdateEvent");
+                (thermalOverlay as any).triggerEvent("UpdateEvent");
+                (gazeInterlock as any).triggerEvent("UpdateEvent");
             }
         }
     };
@@ -163,7 +202,7 @@ async function runAllTests() {
     const leaf = new LEAFTestRunner();
     const context = createScene();
 
-    // LEAF-01
+    // LEAF-01: Spatial Twin Sync
     leaf.describe("LEAF-01: Spatial Twin Sync", () => {
         leaf.it("LEAF-01: Spatial Twin Sync & Coordinate Anchoring", async (ctx) => {
             const calibration = ctx.findComponent("SpatialCalibration");
@@ -183,7 +222,7 @@ async function runAllTests() {
         });
     });
 
-    // LEAF-02
+    // LEAF-02: Live Arc-Flash Hazard & Proximity Breach
     leaf.describe("LEAF-02: Live Arc-Flash Hazard & Proximity Breach", () => {
         leaf.it("LEAF-02: 3D Hazard Bounding Cage & 15cm Hand Proximity Breach Alert", async (ctx) => {
             const shield = ctx.findComponent("ArcFlashSafetyShield");
@@ -207,7 +246,7 @@ async function runAllTests() {
         });
     });
 
-    // LEAF-03
+    // LEAF-03: Guided Mechanical Isolation
     leaf.describe("LEAF-03: Guided Mechanical Isolation", () => {
         leaf.it("LEAF-03: Guided Mechanical Isolation & Residual Amber Power Flow", async (ctx) => {
             const stateCtrl = ctx.findComponent("VoltTwinStateController");
@@ -220,7 +259,7 @@ async function runAllTests() {
         });
     });
 
-    // LEAF-04
+    // LEAF-04: Ghost-Probe Zero-Energy Verification
     leaf.describe("LEAF-04: Ghost-Probe Zero-Energy Verification", () => {
         leaf.it("LEAF-04: 3D Ghost Multimeter Probes & 480V -> 0.0V Discharge Countdown", async (ctx) => {
             const stateCtrl = ctx.findComponent("VoltTwinStateController");
@@ -236,7 +275,7 @@ async function runAllTests() {
         });
     });
 
-    // LEAF-05
+    // LEAF-05: Immutable Cryptographic Tagout
     leaf.describe("LEAF-05: Immutable Cryptographic Tagout", () => {
         leaf.it("LEAF-05: 3D Glowing Digital Padlock & LOTO-HASH-994A Compliance Badge", async (ctx) => {
             const stateCtrl = ctx.findComponent("VoltTwinStateController");
@@ -248,6 +287,74 @@ async function runAllTests() {
             leaf.expect(tagout.complianceBadgeText).toContain("LOTO-HASH-994A");
             leaf.expect(tagout.isPermitCleared).toBe(true);
             leaf.expect(powerFlow.currentFlowMode).toBe(PowerFlowMode.SAFE_EMERALD);
+        });
+    });
+
+    // LEAF-06: Hands-Free Voice Commands
+    leaf.describe("LEAF-06: Hands-Free Voice Commands", () => {
+        leaf.it("LEAF-06: Hands-Free Voice Commands ('Check Status', 'Toggle B2', 'Lockout Complete')", async (ctx) => {
+            const voiceDispatcher = ctx.findComponent("VoiceCommandDispatcher");
+            const stateCtrl = ctx.findComponent("VoltTwinStateController");
+            const panel = ctx.findComponent("SimulatedPanelHardware");
+
+            // Voice: "Check Status"
+            const statusResponse = voiceDispatcher.dispatchVoiceCommand("Check Status");
+            leaf.expect(statusResponse).toContain("CURRENT STATUS");
+            leaf.expect(voiceDispatcher.lastAudioPlayed).toBe("VOICE_CHIME_CONFIRM");
+
+            // Voice: "Toggle B2"
+            voiceDispatcher.dispatchVoiceCommand("Toggle B2");
+            leaf.expect(stateCtrl.currentState).toBe(LOTOState.MECHANICAL_ISOLATION);
+            leaf.expect(panel.isBreakerB2Closed).toBe(false);
+            leaf.expect(voiceDispatcher.lastAudioPlayed).toBe("BREAKER_TRIP_AUDIO");
+
+            // Voice: "Lockout Complete"
+            voiceDispatcher.dispatchVoiceCommand("Lockout Complete");
+            leaf.expect(stateCtrl.currentState).toBe(LOTOState.CRYPTOGRAPHIC_TAGOUT);
+            leaf.expect(voiceDispatcher.lastAudioPlayed).toBe("LOCK_ENGAGE_AUDIO");
+        });
+    });
+
+    // LEAF-07: Dynamic Heatmap & Thermal Load Overlay
+    leaf.describe("LEAF-07: Dynamic Heatmap & Thermal Load", () => {
+        leaf.it("LEAF-07: Dynamic Heatmap & Thermal Load Overlay (Amber-hot to Cold Cryo-blue)", async (ctx) => {
+            const thermal = ctx.findComponent("ThermalHeatmapOverlay");
+
+            // Initial high load state (480V, high current)
+            thermal.setElectricalLoad(480.0, true, true);
+            leaf.expect(thermal.temperatureCelsius).toBeCloseTo(68.0, 1.0);
+            leaf.expect(thermal.thermalGradientColor.x).toBeGreaterThan(0.7); // High red/amber
+
+            // De-energize to zero load and simulate thermal decay
+            thermal.setElectricalLoad(0.0, false);
+            await ctx.wait(2000);
+
+            // Cold cryo-blue temperature
+            leaf.expect(thermal.temperatureCelsius).toBeCloseTo(21.0, 1.5);
+            leaf.expect(thermal.thermalGradientColor.z).toBeGreaterThan(0.7); // High blue component
+        });
+    });
+
+    // LEAF-08: Gaze Dwell Verification Safety Interlock
+    leaf.describe("LEAF-08: Gaze Dwell Safety Interlock", () => {
+        leaf.it("LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on Terminal Pin T1)", async (ctx) => {
+            const gaze = ctx.findComponent("GazeDwellInterlock");
+            const probeVerifier = ctx.findComponent("GhostProbeVerifier");
+
+            gaze.startGazeTracking("TerminalPinT1");
+            leaf.expect(gaze.isDwellLocked).toBe(false);
+            leaf.expect(gaze.dwellProgress).toBe(0.0);
+
+            // Incomplete dwell: 0.8s (< 1.5s threshold)
+            gaze.simulateGazeDwell(0.8);
+            leaf.expect(gaze.dwellProgress).toBeCloseTo(0.53, 0.05);
+            leaf.expect(gaze.isDwellLocked).toBe(false);
+
+            // Complete dwell: +0.7s (total 1.5s)
+            gaze.simulateGazeDwell(0.7);
+            leaf.expect(gaze.isDwellLocked).toBe(true);
+            leaf.expect(gaze.dwellProgress).toBe(1.0);
+            leaf.expect(probeVerifier.canConfirmZeroEnergy).toBe(true);
         });
     });
 
@@ -271,7 +378,7 @@ async function runAllTests() {
     console.log("--------------------------------------------------------------------------------");
 
     if (failCount === 0) {
-        console.log("🎉 ALL 5 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
+        console.log("🎉 ALL 8 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
     } else {
         process.exit(1);
     }

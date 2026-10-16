@@ -6,6 +6,8 @@ import { PowerFlowXRay } from "./PowerFlowXRay";
 import { GhostProbeVerifier } from "./GhostProbeVerifier";
 import { CryptographicTagout } from "./CryptographicTagout";
 import { SimulatedPanelHardware } from "./SimulatedPanelHardware";
+import { ThermalHeatmapOverlay } from "./ThermalHeatmapOverlay";
+import { GazeDwellInterlock } from "./GazeDwellInterlock";
 
 /**
  * VoltTwinStateController.ts
@@ -33,6 +35,12 @@ export class VoltTwinStateController extends BaseScriptComponent {
 
     @input
     panelHardware: SimulatedPanelHardware;
+
+    @input
+    thermalOverlay: ThermalHeatmapOverlay;
+
+    @input
+    gazeInterlock: GazeDwellInterlock;
 
     @input
     stateInstructionPill: SceneObject;
@@ -132,26 +140,34 @@ export class VoltTwinStateController extends BaseScriptComponent {
         if (this.powerFlowXRay) {
             this.powerFlowXRay.setMode(PowerFlowMode.LIVE_480V_RED);
         }
+        if (this.thermalOverlay) {
+            this.thermalOverlay.setElectricalLoad(480.0, true);
+        }
     }
 
     private enterStateMechanicalIsolation(): void {
-        this.updateInstructionUI("STEP 1: ISOLATE BREAKER B2 (PINCH SWITCH)");
+        this.updateInstructionUI("STEP 1: ISOLATE BREAKER B2 (PINCH OR SAY 'TOGGLE B2')");
         if (this.proximitySensor) {
             this.proximitySensor.setArmed(false);
         }
-        // When Breaker B2 is isolated:
         if (this.panelHardware) {
             this.panelHardware.setBreakerB2State(false);
         }
         if (this.powerFlowXRay) {
             this.powerFlowXRay.setMode(PowerFlowMode.RESIDUAL_AMBER);
         }
+        if (this.thermalOverlay) {
+            this.thermalOverlay.setElectricalLoad(180.0, true);
+        }
     }
 
     private enterStateZeroEnergyVerification(): void {
-        this.updateInstructionUI("STEP 2: VERIFY 0.0V AT TERMINALS T1-T2");
+        this.updateInstructionUI("STEP 2: GAZE 1.5s AT T1 & VERIFY 0.0V");
         if (this.ghostProbeVerifier) {
             this.ghostProbeVerifier.startVerification();
+        }
+        if (this.thermalOverlay) {
+            this.thermalOverlay.setElectricalLoad(0.0, false);
         }
     }
 
@@ -165,6 +181,9 @@ export class VoltTwinStateController extends BaseScriptComponent {
         }
         if (this.cryptographicTagout) {
             this.cryptographicTagout.engageLockout();
+        }
+        if (this.thermalOverlay) {
+            this.thermalOverlay.setElectricalLoad(0.0, false);
         }
     }
 

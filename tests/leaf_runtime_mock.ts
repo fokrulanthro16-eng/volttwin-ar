@@ -182,6 +182,16 @@ export class LEAFTestRunner {
                 if (typeof actual !== "string" || !actual.includes(expectedSubstring)) {
                     throw new Error(`Expected "${actual}" to contain "${expectedSubstring}"`);
                 }
+            },
+            toBeGreaterThan: (expected: number) => {
+                if (typeof actual !== "number" || actual <= expected) {
+                    throw new Error(`Expected ${actual} to be greater than ${expected}`);
+                }
+            },
+            toBeLessThan: (expected: number) => {
+                if (typeof actual !== "number" || actual >= expected) {
+                    throw new Error(`Expected ${actual} to be less than ${expected}`);
+                }
             }
         };
     }

@@ -4,38 +4,40 @@
 ---
 
 ## 1. Executive Summary & Design Philosophy
-VoltTwin AR v2.0 transforms dangerous, error-prone high-voltage electrical maintenance into a zero-fatality, spatially guided workflow. Rather than forcing technicians to balance 2D paper schematics or tablets while handling 1000V insulated probes and screwdrivers, VoltTwin AR leverages Snap SPECS to anchor 1:1 real-world 3D safety perimeters, animated X-ray internal power conduits, and holographic alignment guides directly over physical equipment.
+VoltTwin AR v2.0 transforms dangerous, error-prone high-voltage electrical maintenance into a zero-fatality, spatially guided workflow. Rather than forcing technicians to balance 2D paper schematics or tablets while handling 1000V insulated probes and screwdrivers, VoltTwin AR leverages Snap SPECS to anchor 1:1 real-world 3D safety perimeters, animated X-ray internal power conduits, live thermal load gradients, and holographic alignment guides directly over physical equipment.
 
 ```
-+---------------------------------------------------------------------------------------+
-|                                    SNAP SPECS AR                                      |
-|                                                                                       |
-|  [Headset RGB/Depth Sensor]                [Spatial Audio Engine]                     |
-|           |                                          |                                |
-|           v                                          v                                |
-|  [Spatial Calibration]                    [Proximity & Breach Audio]                  |
-|  (LiDAR Grid Alignment)                   (NFPA 70E Acoustic Pings)                   |
-|           |                                          ^                                |
-|           +-------------------+                      |                                |
-|                               v                      |                                |
-|                     +---------------------------------------+                         |
-|                     |     VoltTwin State Machine Controller |                         |
-|                     |     - State 1: Spatial Sync           |                         |
-|                     |     - State 2: Live Arc-Flash Shield  |                         |
-|                     |     - State 3: Guided Isolation       |                         |
-|                     |     - State 4: Ghost-Probe 0V Verify  |                         |
-|                     |     - State 5: Cryptographic Tagout   |                         |
-|                     +---------------------------------------+                         |
-|                               |                      |                                |
-|            +------------------+                      +-----------------+              |
-|            v                                                           v              |
-|   [SIK Hand-Tracking Engine]                                  [Spatial Visuals Engine]|
-|   - Hand Joint Distance Math                                  - 3D Hazard Bounding Box|
-|   - Air-Pinch Gesture Detection                               - 1-Meter Perimeter Ring|
-|   - Proximity Breach Boundary (15cm)                          - Holographic Wire Glow |
-|                                                               - 3D Translucent Probes |
-|                                                               - 3D Glowing Padlock    |
-+---------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------------+
+|                                        SNAP SPECS AR                                          |
+|                                                                                               |
+|  [Headset RGB/Depth Sensor]     [Microphone Speech Engine]         [Spatial Audio Engine]     |
+|           |                                 |                                 |               |
+|           v                                 v                                 v               |
+|  [Spatial Calibration]          [Voice Command Dispatcher]        [Proximity & Breach Audio]  |
+|  (LiDAR Grid Alignment)         - "Check Status"                  - NFPA 70E Acoustic Pings   |
+|           |                     - "Toggle B2"                     - State Chimes & Dwell Cues |
+|           |                     - "Lockout Complete"                          ^               |
+|           |                                 |                                 |               |
+|           +-------------------+             +---------------------------------+               |
+|                               v             v                                                 |
+|                     +---------------------------------------+                                 |
+|                     |     VoltTwin State Machine Controller |                                 |
+|                     |     - State 1: Spatial Sync           |                                 |
+|                     |     - State 2: Live Arc-Flash Shield  |                                 |
+|                     |     - State 3: Guided Isolation       |                                 |
+|                     |     - State 4: Ghost-Probe 0V Verify  |                                 |
+|                     |     - State 5: Cryptographic Tagout   |                                 |
+|                     +---------------------------------------+                                 |
+|                               |                     |                                         |
+|            +------------------+                     +------------------+                      |
+|            v                                                           v                      |
+|   [SIK & Safety Interlocks Engine]                            [Spatial Visuals Engine]        |
+|   - Hand Joint Proximity Math (15cm)                          - 3D Hazard Bounding Cage       |
+|   - Head-Gaze Dwell Interlock (1.5s on T1)                    - 1-Meter Floor Perimeter Ring  |
+|   - Air-Pinch Gesture Detection                               - Dynamic Thermal Heatmap Shader|
+|                                                               - 3D Translucent Probes         |
+|                                                               - 3D Glowing Digital Padlock    |
++-----------------------------------------------------------------------------------------------+
 ```
 
 ---
@@ -49,16 +51,16 @@ VoltTwin AR strictly enforces OSHA 29 CFR 1910.147 and NFPA 70E compliance throu
         | (Air-Pinch / Calibrate)
         v
 [ State 2: Live Arc-Flash Shield & Proximity Detection ]
-        | (Acknowledge Live 480V Warning)
+        | (Acknowledge Live 480V Warning / Voice: "Check Status")
         v
 [ State 3: Guided Mechanical Isolation ]
-        | (Flip Breaker B2 -> Residual Amber Warning)
+        | (Flip Breaker B2 / Voice: "Toggle B2" -> Residual Amber Warning)
         v
 [ State 4: Ghost-Probe Zero-Energy Verification ]
-        | (Align Probes to T1-T2 -> 480V -> 42V -> 0.0V Discharge)
+        | (1.5s Gaze Dwell on T1 -> Align Probes -> 480V -> 42V -> 0.0V Discharge)
         v
 [ State 5: Immutable Cryptographic Tagout ]
-        | (Generate LOTO-HASH-994A -> Green Padlock Engaged)
+        | (Voice: "Lockout Complete" -> Generate LOTO-HASH-994A -> Green Padlock Engaged)
         v
 [ WORK PERMIT CLEARED ]
 ```
@@ -66,86 +68,82 @@ VoltTwin AR strictly enforces OSHA 29 CFR 1910.147 and NFPA 70E compliance throu
 ### State 1: Spatial Twin Sync (Calibration)
 * **Objective:** Anchor the spatial reference coordinate system onto physical `Panel #HV-402`.
 * **Visuals:** Pulsing cyan LiDAR-style wireframe grid overlaid on the target panel plane.
-* **Trigger:** SIK Air-Pinch gesture or Preview click locks the world transform at `(0, -10, -90)` cm relative to initial head pose.
-* **Validation:** Coordinate drift damped using exponential smoothing; visual confirmation chime.
+* **Trigger:** SIK Air-Pinch gesture or Preview click locks the world transform at `(0, -10, -90)` cm.
 
 ### State 2: Live Arc-Flash Shield & 3D X-Ray Power Flow
 * **Objective:** Establish the NFPA 70E Arc-Flash Boundary and alert technician to energized 480V conductors.
 * **Visuals:**
-  * **3D Hazard Bounding Cage:** Semi-transparent crimson cube (`#FF1E27`, alpha 0.45) with pulsing wireframe edges surrounding the main 480V busbars.
-  * **1-Meter Floor Perimeter Ring:** Projected circle ($r = 100\text{ cm}$) on the floor around the cabinet, pulsing at 1.2 Hz with animated chevron arrows.
-  * **3D Internal X-Ray Wiring:** Cylindrical conduits showing illuminated red particles flowing at 0.5 m/s from Main Bus to Breakers B1–B4.
-* **Hand-Proximity Safety Interlock:** Hand tracking monitors euclidean distance $d$ from user palm/index tip to the Hazard Cage:
+  * **3D Hazard Bounding Cage:** Semi-transparent crimson cube (`#FF1E27`, alpha 0.45) with pulsing wireframe edges.
+  * **1-Meter Floor Perimeter Ring:** Projected circle ($r = 100\text{ cm}$) on the floor around the cabinet, pulsing at 1.2 Hz.
+  * **Thermal Load Heatmap:** Conduits glow amber-hot ($68^\circ\text{C}$, `#FF6600`) representing high electrical load.
+* **Hand-Proximity Safety Interlock:** Hand tracking monitors distance $d$ from user palm/index tip to the Hazard Cage:
   $$\text{If } d \le 15\text{ cm} \implies \text{TRIGGER IMMEDIATE STROBE ALARM} + \text{WARNING CHIME}$$
 
 ### State 3: Guided Mechanical Isolation
-* **Objective:** Guide technician to safely mechanically isolate Breaker B2 without touching neighboring live circuits.
-* **Visuals:**
-  * 3D pulsating directional chevron pointing at Breaker B2 handle.
-  * Translucent Ghost Lever illustrating the downward flip motion (ON $\to$ OFF).
-  * Hover highlight on B2 touch target ($10 \times 10\text{ cm}$).
-* **Transition Trigger:** Breaker B2 toggled to OFF via Air-Pinch or physical lever action.
+* **Objective:** Guide technician to safely mechanically isolate Breaker B2 hands-free.
+* **Voice Command:** "Toggle B2" mechanically trips Breaker B2 without physical touch.
+* **Transition Trigger:** Breaker B2 toggled to OFF via Voice Command, Air-Pinch, or lever action.
 * **State Transition:** Power flow downstream of B2 switches from bright Red ($480\text{ V}$) to pulsating Amber ($180\text{ V}$ residual capacitor discharge warning).
 
-### State 4: Ghost-Probe Zero-Energy Verification
-* **Objective:** Ensure technician validates zero electrical potential before touching internal contacts.
-* **Visuals:**
-  * Two translucent 3D multimeter probes appear at $45^\circ$ angle of incidence:
-    * **Red Probe (+):** Spatially locked 5 cm above Terminal Pin T1.
-    * **Black Probe (-):** Spatially locked 5 cm above Terminal Pin T2.
-  * Floating Spatial Pill: Billboards above terminals displaying simulated real-time voltage decay:
-    $$\text{Countdown: } 480.0\text{ V} \to 240.2\text{ V} \to 42.8\text{ V} \to 0.0\text{ V (VERIFIED SAFE)}$$
-* **Confirmation:** SIK Air-Pinch confirms zero energy verification.
+### State 4: Ghost-Probe Zero-Energy Verification & Gaze Dwell Interlock
+* **Objective:** Ensure technician validates zero electrical potential with safety verification.
+* **Gaze Dwell Safety Interlock:** To prevent false confirmations, technician's head-gaze must lock onto Terminal Pin T1 continuously for $1.5\text{ seconds}$. A circular radial progress reticle fills in real time.
+* **Ghost Probes Visuals:**
+  * Red Probe (+) locked onto Terminal T1.
+  * Black Probe (-) locked onto Terminal T2.
+  * Live discharge countdown: $480.0\text{ V} \to 42.0\text{ V} \to 0.0\text{ V (VERIFIED SAFE)}$.
+  * Dynamic thermal cooling: Conduits transition from amber-hot to cold blue ($21^\circ\text{C}$, `#1A8CFF`).
 
 ### State 5: Immutable Cryptographic Tagout (Safe to Work)
 * **Objective:** Issue digital lockout authorization and mark the workspace safe.
+* **Voice Command:** "Lockout Complete" finalizes clearance when zero energy is verified.
 * **Visuals:**
-  * All red/amber hazard cages and floor rings transition to soothing **Emerald Green** (`#00E676`).
-  * A 3D metallic digital padlock animates into position over Breaker B2 handle, locking with a metallic snap sound effect.
-  * Floating tamper-proof compliance badge displays:
-    `LOTO-HASH-994A | CLEARED FOR MAINTENANCE | TIMESTAMP: 2026-10-16 14:50 UTC`
+  * All red/amber hazard cages transition to **Emerald Green** (`#00E676`).
+  * 3D glowing green digital padlock snaps over B2 handle with metallic latch audio.
+  * Cryptographic compliance badge displays: `LOTO-HASH-994A | CLEARED FOR MAINTENANCE`.
 
 ---
 
-## 3. Spatial Coordinate & Placement Specification
+## 3. Hands-Free Voice Commands Specification
 
-All dimensions are modeled in 1:1 real-world metric units (centimeters):
+```typescript
+export interface VoiceCommandBinding {
+    phrase: string;
+    targetState: LOTOState;
+    action: () => void;
+    confirmationAudio: string;
+}
+```
 
-| Object / Component | Real-World Dimensions (cm) | Spatial Position relative to Panel Anchor | Orientation | Material / Shader |
-| :--- | :--- | :--- | :--- | :--- |
-| **Panel Cabinet #HV-402** | $60 \times 80 \times 25$ | $(0, 0, 0)$ cm | $0^\circ, 0^\circ, 0^\circ$ | Matte Dark Charcoal (#1A1A1A) |
-| **Main 480V Breaker** | $18 \times 14 \times 10$ | $(0, 22, 5)$ cm | $0^\circ, 0^\circ, 0^\circ$ | High-contrast Danger Yellow/Black |
-| **Hazard Bounding Cage** | $22 \times 18 \times 14$ | $(0, 22, 5)$ cm | $0^\circ, 0^\circ, 0^\circ$ | Translucent Red Pulsing Wireframe |
-| **Arc-Flash Floor Ring** | Radius $100\text{ cm}$, Thickness $4\text{ cm}$ | $(0, -90, 0)$ cm (Floor) | Flat on XZ plane | Additive Pulsing Emissive Ring |
-| **Branch Breaker B2** | $8 \times 12 \times 6$ | $(-14, -5, 5)$ cm | $0^\circ, 0^\circ, 0^\circ$ | Industrial Switch with Hover Glow |
-| **Terminal Pins T1 & T2** | $1.5 \times 1.5 \times 4$ each (spacing: 6 cm) | $(14, -18, 5)$ cm | $0^\circ, 0^\circ, 0^\circ$ | Copper Conductive Shader |
-| **Ghost Multimeter Probes**| Length $15\text{ cm}$, Diameter $1.2\text{ cm}$ | $(14, -13, 10)$ cm | Angled $45^\circ$ downward | Red/Black Glass Translucent Fresnels |
-| **3D Digital Padlock** | $10 \times 14 \times 4$ | $(-14, -5, 12)$ cm | $0^\circ, 0^\circ, 0^\circ$ | Glowing Emerald Chrome (#00E676) |
-| **Floating Status Pill** | $24 \times 8 \times 1.5$ | Dynamic: $10\text{ cm}$ above target | Billboard to Headset | Translucent Frosted Glass UI |
-
----
-
-## 4. Spectacles Interaction Kit (SIK) Integration
-
-### Hands-Free Ergonomics
-To ensure compliance with industrial safety codes (NFPA 70E), the technician must never be forced to touch physical screens or hold mobile devices:
-1. **Raycast Pointer & Air-Pinch:** SIK Interactor enables natural pinch-to-select targeting from comfortable resting arm positions.
-2. **Proximity Trigger Volume:** Real-time distance evaluation using joint tracking:
-   ```typescript
-   const distance = handJointTransform.getWorldPosition().distance(hazardCageTransform.getWorldPosition());
-   if (distance < PROXIMITY_THRESHOLD_CM && isBreakerLive) {
-       triggerProximityBreachAlert();
-   }
-   ```
-3. **Ergonomic Viewing Cone:** All interactive elements and visual indicators remain strictly inside the central $32^\circ \times 37^\circ$ field of view (FOV) at an arm's reach distance of $60\text{--}90\text{ cm}$.
+| Voice Trigger Phrase | Primary Action | Confirmation Audio Cue | Preview Fallback Button |
+| :--- | :--- | :--- | :--- |
+| **"Check Status"** | Announces current state & active hazards | `VOICE_CHIME_CONFIRM` (double ping) | Floating UI Status Pill Click |
+| **"Toggle B2"** | Isolates Breaker B2 (ON -> OFF) | `BREAKER_TRIP_AUDIO` (mechanical clack) | SIK Breaker B2 Switch Click |
+| **"Lockout Complete"** | Engages digital padlock & generates hash | `LOCK_ENGAGE_AUDIO` (metallic snap) | Complete Tagout Pill Click |
 
 ---
 
-## 5. Additive Display & Optical Optimization
-Snap SPECS feature an additive wave-guide optical display where black ($#000000$) renders as transparent:
-* **High Contrast Color Palette:**
-  * Hazard Alert: Bright Saturated Crimson (`#FF202B`)
-  * Residual Caution: High-Luminance Amber (`#FFB300`)
-  * Safe / Verified: Vibrant Emerald Green (`#00E676`)
-  * Calibration Grid: Neon Cyan (`#00E5FF`)
-* **Text Legibility:** All status typography uses bold, sans-serif high-emissive white text with contrasting tinted pill backing plates.
+## 4. Dynamic Thermal Heatmap & Load Overlay
+
+Conduit temperatures are simulated based on Joule heating dissipation ($P = I^2 R$):
+$$T(t) = T_{\text{ambient}} + (T_{\text{max}} - T_{\text{ambient}}) \cdot e^{-t / \tau}$$
+* **High Load State (Energized 480V):**
+  * Temperature: $68.4^\circ\text{C}$
+  * Color: Amber-Hot `#FF6600` (`vec4(1.0, 0.4, 0.0, 0.9)`)
+  * Shader Effect: High-frequency heat shimmer pulsation
+* **De-Energized State (Zero Energy 0.0V):**
+  * Temperature: $21.2^\circ\text{C}$ (ambient equilibrium)
+  * Color: Cold Cryo Blue `#1A8CFF` (`vec4(0.1, 0.55, 1.0, 0.75)`)
+  * Shader Effect: Static translucent cool glow
+
+---
+
+## 5. Gaze Dwell Safety Interlock Engine
+
+To eliminate accidental single-pinch misfires during hazardous electrical testing:
+1. **Raycast Origin:** Glasses head pose center vector $\vec{V}_{\text{head}}$.
+2. **Target Volume:** Terminal Pin T1 bounding cylinder ($r = 3\text{ cm}$, $h = 5\text{ cm}$).
+3. **Dwell Accumulator:**
+   $$\text{Progress}(t) = \min\left(1.0, \frac{\Delta t_{\text{locked}}}{1.5\text{ s}}\right)$$
+4. **Visual Indicator:** Billboarding radial progress ring fills from $0^\circ$ to $360^\circ$ around Terminal Pin T1.
+5. **Interlock Trigger:** Only when $\text{Progress} = 1.0$ is the Zero-Energy confirmation unlocked.

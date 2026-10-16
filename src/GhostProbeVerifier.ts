@@ -1,8 +1,10 @@
 import { VoltageVerificationData } from "./VoltTwinTypes";
+import { GazeDwellInterlock } from "./GazeDwellInterlock";
 
 /**
  * GhostProbeVerifier.ts
  * Manages 3D translucent multimeter ghost probes and automated zero-energy discharge countdown.
+ * Integrates with GazeDwellInterlock requiring 1.5s gaze dwell before completing verification.
  */
 @component
 export class GhostProbeVerifier extends BaseScriptComponent {
@@ -17,6 +19,9 @@ export class GhostProbeVerifier extends BaseScriptComponent {
 
     @input
     voltageTextComponent: Text;
+
+    @input
+    gazeInterlock: GazeDwellInterlock;
 
     private _probesVisible: boolean = false;
     private _isDischarging: boolean = false;
@@ -45,6 +50,13 @@ export class GhostProbeVerifier extends BaseScriptComponent {
         return this._voltageData.isVerified;
     }
 
+    public get canConfirmZeroEnergy(): boolean {
+        // Can confirm only when voltage is 0.0V AND gaze dwell is locked (or not bound)
+        const isVoltageZero = this._voltageData.currentReading === 0.0;
+        const isGazeCleared = !this.gazeInterlock || this.gazeInterlock.isDwellLocked;
+        return isVoltageZero && isGazeCleared;
+    }
+
     /**
      * Show ghost probes and start voltage discharge countdown
      */
@@ -58,6 +70,10 @@ export class GhostProbeVerifier extends BaseScriptComponent {
         if (this.redProbeObject) this.redProbeObject.enabled = true;
         if (this.blackProbeObject) this.blackProbeObject.enabled = true;
         if (this.voltageDisplayPillObject) this.voltageDisplayPillObject.enabled = true;
+
+        if (this.gazeInterlock) {
+            this.gazeInterlock.startGazeTracking("TerminalPinT1");
+        }
 
         this.updateVoltageUI();
     }
@@ -90,7 +106,7 @@ export class GhostProbeVerifier extends BaseScriptComponent {
     private onUpdate(): void {
         if (!this._isDischarging || this._voltageData.isVerified) return;
 
-        const dt = getDeltaTime();
+        const dt = (globalThis as any).getDeltaTime ? (globalThis as any).getDeltaTime() : 0.016;
         this._dischargeTimer += dt;
 
         // Exponential discharge curve simulation over 2.5 seconds
