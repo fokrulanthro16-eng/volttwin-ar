@@ -65,13 +65,16 @@ volttwin-ar/
 │   ├── PowerFlowXRay.ts               # 3D Holographic Conduit Particle Shaders
 │   ├── GhostProbeVerifier.ts          # 3D Multimeter Probes & 0V Discharge Countdown
 │   ├── CryptographicTagout.ts         # 3D Glowing Green Padlock & Audit Hash Badge
-│   ├── VoiceCommandDispatcher.ts      # Hands-Free Speech Engine ("Toggle B2", "Lockout Complete")
+│   ├── VoiceCommandDispatcher.ts      # Hands-Free Speech Engine ("Toggle B2", "Lockout Complete", "Explode View")
 │   ├── ThermalHeatmapOverlay.ts       # Dynamic Joule Heating Gradient (Amber-Hot to Cold-Blue)
 │   ├── GazeDwellInterlock.ts          # 1.5-Second Head-Gaze Lock Safety Interlock on T1
+│   ├── SpatialObjectDetection.ts      # Optical CV Tracking Box & 99.4% Confidence Lock
+│   ├── ExplodedViewController.ts      # 3D Exploded-View Architecture & Module Expansion
+│   ├── RemoteSupervisorTelemetry.ts   # Live Expert Hologram & Audio Waveform HUD
 │   └── SimulatedPanelHardware.ts      # Virtual Panel Stand-In for Instant Preview Testing
 ├── tests/                             # Automated Test Verification Framework
 │   ├── leaf_runtime_mock.ts           # Lens Studio & LEAF Runtime Simulation Engine
-│   └── run_leaf_tests.ts              # Executable LEAF Automated Test Suite (8 Scenarios)
+│   └── run_leaf_tests.ts              # Executable LEAF Automated Test Suite (10 Scenarios)
 ├── .agents/skills/plan-lens/          # Installed Devpost Hackathon Skill Pack
 ├── volttwin-ar.esproj                 # Lens Studio Spectacles Project Descriptor
 ├── .mcp.json                          # Lens Studio MCP Server Configuration
@@ -80,7 +83,7 @@ volttwin-ar/
 
 ---
 
-## 🧪 Automated Testing with LEAF (8 of 8 Scenarios Passing)
+## 🧪 Automated Testing with LEAF (10 of 10 Scenarios Passing)
 Run the automated test suite locally:
 ```bash
 npx tsx tests/run_leaf_tests.ts
@@ -93,4 +96,7 @@ npx tsx tests/run_leaf_tests.ts
 * `LEAF-05: 3D Glowing Digital Padlock & LOTO-HASH-994A Compliance Badge` -> **PASS**
 * `LEAF-06: Hands-Free Voice Commands ("Check Status", "Toggle B2", "Lockout Complete")` -> **PASS**
 * `LEAF-07: Dynamic Heatmap & Thermal Load Overlay (Amber-hot to Cold Cryo-blue)` -> **PASS**
+* `LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on Terminal Pin T1)` -> **PASS**
+* `LEAF-09: Real-Time Spatial Object Detection Simulation (99.4% confidence lock)` -> **PASS**
+* `LEAF-10: 3D Exploded-View Architecture (+25cm / +15cm module expansion)` -> **PASS**
 * `LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on Terminal Pin T1)` -> **PASS**

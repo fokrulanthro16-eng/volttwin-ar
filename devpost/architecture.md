@@ -147,3 +147,25 @@ To eliminate accidental single-pinch misfires during hazardous electrical testin
    $$\text{Progress}(t) = \min\left(1.0, \frac{\Delta t_{\text{locked}}}{1.5\text{ s}}\right)$$
 4. **Visual Indicator:** Billboarding radial progress ring fills from $0^\circ$ to $360^\circ$ around Terminal Pin T1.
 5. **Interlock Trigger:** Only when $\text{Progress} = 1.0$ is the Zero-Energy confirmation unlocked.
+
+---
+
+## 6. Real-Time Spatial Object Detection Engine
+* **Optical CV Bounding Box:** Renders an animated green holographic tracking cube enclosing `Panel #HV-402` during initial targeting.
+* **Confidence Rating:** Displays real-time optical confidence verification: `TARGET: Panel #HV-402 [CONFIDENCE: 99.4%]`.
+* **Anchor Lock:** Locks coordinate frame upon confidence verification and Air-Pinch confirmation.
+
+---
+
+## 7. 3D Exploded-View Kinematics
+* **Smooth Outward Expansion:**
+  * Front Door Panel: $\Delta Z = +25.0\text{ cm}$
+  * Busbar Module: $\Delta Y = +10.0\text{ cm}, \Delta Z = +15.0\text{ cm}$
+  * Terminal Module: $\Delta Y = -10.0\text{ cm}, \Delta Z = +10.0\text{ cm}$
+* **Voice Trigger:** "Explode View" and "Collapse View" dispatches smooth lerp interpolation between collapsed and exploded states.
+
+---
+
+## 8. Volumetric Plasma Particle Blast & Remote Expert HUD
+* **Arc-Flash Plasma Spark Blast:** Breaching $\le 15\text{ cm}$ in State 2 unleashes dynamic 3D plasma spark particles accompanied by Web Audio synthesized electrical crackle sound.
+* **Encrypted Remote Telemetry:** Waveguide HUD displays live supervisor communication waveform: `REMOTE EXPERT: ENG-SARAH-CHEN | ENCRYPTED 5G LINK (12ms)`.

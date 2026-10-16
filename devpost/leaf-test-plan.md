@@ -22,6 +22,8 @@ This test plan defines the automated LEAF scenarios that validate all 8 Done Cri
 | **LEAF-06** | #6: Hands-Free Voice Commands | `test_hands_free_voice_commands` | `VoiceCommandDispatcher`, `VoltTwinStateController` | "Toggle B2", "Lockout Complete", "Check Status" trigger state changes & audio | PASS |
 | **LEAF-07** | #7: Dynamic Heatmap & Thermal Load | `test_thermal_load_overlay_transition` | `ThermalHeatmapOverlay`, `PowerFlowXRay` | Amber-hot (68°C) under high load cools to cold blue (21°C) on isolation | PASS |
 | **LEAF-08** | #8: Gaze Dwell Verification Interlock | `test_gaze_dwell_safety_interlock` | `GazeDwellInterlock`, `GhostProbeVerifier` | Requires 1.5s continuous head-gaze lock on T1 before 0V verification completes | PASS |
+| **LEAF-09** | #9: Spatial Object Detection Lock | `test_cv_object_detection_lock` | `SpatialObjectDetection` | CV scanning locks on Panel #HV-402 with 99.4% confidence | PASS |
+| **LEAF-10** | #10: Exploded 3D View Animation | `test_exploded_view_animation` | `ExplodedViewController` | Modules smoothly expand +25cm / +15cm outward in 3D world space | PASS |
 
 ---
 
@@ -185,6 +187,47 @@ leaf.describe("LEAF-08: Gaze Dwell Verification Safety Interlock", () => {
         leaf.expect(gaze.isDwellLocked).toBe(true);
         leaf.expect(gaze.dwellProgress).toBe(1.0);
         leaf.expect(probeVerifier.canConfirmZeroEnergy).toBe(true);
+    });
+});
+```
+
+### LEAF-09: Spatial Object Detection Lock (`test_cv_object_detection_lock`)
+```typescript
+leaf.describe("LEAF-09: Spatial Object Detection Lock", () => {
+    leaf.it("should simulate optical CV scanning and lock on Panel #HV-402 with 99.4% confidence", async (context) => {
+        const objectDetection = context.findComponent("SpatialObjectDetection");
+        
+        objectDetection.startScan();
+        leaf.expect(objectDetection.isLocked).toBe(false);
+        leaf.expect(objectDetection.confidenceScore).toBe(0.0);
+        
+        // Simulate CV processing duration
+        await context.wait(1500);
+        leaf.expect(objectDetection.isLocked).toBe(true);
+        leaf.expect(objectDetection.confidenceScore).toBeCloseTo(0.994, 0.005);
+        leaf.expect(objectDetection.hudStatusText).toContain("CONFIDENCE: 99.4%");
+    });
+});
+```
+
+### LEAF-10: Exploded 3D View Animation (`test_exploded_view_animation`)
+```typescript
+leaf.describe("LEAF-10: Exploded 3D View Animation", () => {
+    leaf.it("should smoothly animate cabinet modules outward to expose internal wiring", async (context) => {
+        const explodedController = context.findComponent("ExplodedViewController");
+        const frontDoor = context.findSceneObject("FrontDoor");
+        
+        leaf.expect(explodedController.isExploded).toBe(false);
+        leaf.expect(explodedController.explosionProgress).toBe(0.0);
+        
+        explodedController.setExploded(true);
+        leaf.expect(explodedController.isExploded).toBe(true);
+        
+        // Wait for smooth lerp expansion
+        await context.wait(1000);
+        leaf.expect(explodedController.explosionProgress).toBeCloseTo(1.0, 0.05);
+        const doorPos = frontDoor.getTransform().getWorldPosition();
+        leaf.expect(doorPos.z).toBeCloseTo(25.0, 2.0); // +25cm outward
     });
 });
 ```

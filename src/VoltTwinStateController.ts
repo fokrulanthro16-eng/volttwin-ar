@@ -8,6 +8,9 @@ import { CryptographicTagout } from "./CryptographicTagout";
 import { SimulatedPanelHardware } from "./SimulatedPanelHardware";
 import { ThermalHeatmapOverlay } from "./ThermalHeatmapOverlay";
 import { GazeDwellInterlock } from "./GazeDwellInterlock";
+import { SpatialObjectDetection } from "./SpatialObjectDetection";
+import { ExplodedViewController } from "./ExplodedViewController";
+import { RemoteSupervisorTelemetry } from "./RemoteSupervisorTelemetry";
 
 /**
  * VoltTwinStateController.ts
@@ -41,6 +44,15 @@ export class VoltTwinStateController extends BaseScriptComponent {
 
     @input
     gazeInterlock: GazeDwellInterlock;
+
+    @input
+    objectDetection: SpatialObjectDetection;
+
+    @input
+    explodedController: ExplodedViewController;
+
+    @input
+    remoteSupervisor: RemoteSupervisorTelemetry;
 
     @input
     stateInstructionPill: SceneObject;
@@ -118,11 +130,17 @@ export class VoltTwinStateController extends BaseScriptComponent {
         if (this.spatialCalibration) {
             this.spatialCalibration.startCalibration();
         }
+        if (this.objectDetection) {
+            this.objectDetection.startScan();
+        }
         if (this.safetyShield) {
             this.safetyShield.setShieldActive(false);
         }
         if (this.proximitySensor) {
             this.proximitySensor.setArmed(false);
+        }
+        if (this.explodedController) {
+            this.explodedController.setExploded(false);
         }
     }
 
@@ -130,6 +148,9 @@ export class VoltTwinStateController extends BaseScriptComponent {
         this.updateInstructionUI("DANGER: 480V LIVE BUSBARS | 1.0M ARC-FLASH PERIMETER");
         if (this.spatialCalibration) {
             this.spatialCalibration.lockAnchor();
+        }
+        if (this.objectDetection) {
+            this.objectDetection.lockTarget(0.994);
         }
         if (this.safetyShield) {
             this.safetyShield.setShieldActive(true, PowerFlowMode.LIVE_480V_RED);
@@ -141,7 +162,7 @@ export class VoltTwinStateController extends BaseScriptComponent {
             this.powerFlowXRay.setMode(PowerFlowMode.LIVE_480V_RED);
         }
         if (this.thermalOverlay) {
-            this.thermalOverlay.setElectricalLoad(480.0, true);
+            this.thermalOverlay.setElectricalLoad(480.0, true, true);
         }
     }
 
@@ -157,7 +178,7 @@ export class VoltTwinStateController extends BaseScriptComponent {
             this.powerFlowXRay.setMode(PowerFlowMode.RESIDUAL_AMBER);
         }
         if (this.thermalOverlay) {
-            this.thermalOverlay.setElectricalLoad(180.0, true);
+            this.thermalOverlay.setElectricalLoad(180.0, true, true);
         }
     }
 
@@ -167,7 +188,7 @@ export class VoltTwinStateController extends BaseScriptComponent {
             this.ghostProbeVerifier.startVerification();
         }
         if (this.thermalOverlay) {
-            this.thermalOverlay.setElectricalLoad(0.0, false);
+            this.thermalOverlay.setElectricalLoad(0.0, false, false);
         }
     }
 
@@ -183,7 +204,7 @@ export class VoltTwinStateController extends BaseScriptComponent {
             this.cryptographicTagout.engageLockout();
         }
         if (this.thermalOverlay) {
-            this.thermalOverlay.setElectricalLoad(0.0, false);
+            this.thermalOverlay.setElectricalLoad(0.0, false, false);
         }
     }
 

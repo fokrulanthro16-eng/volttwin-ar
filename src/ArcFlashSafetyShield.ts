@@ -2,7 +2,8 @@ import { PowerFlowMode } from "./VoltTwinTypes";
 
 /**
  * ArcFlashSafetyShield.ts
- * Manages the 3D Hazard Bounding Cage and 1-meter NFPA 70E Arc-Flash Floor Perimeter Ring.
+ * Manages the 3D Hazard Bounding Cage, 1-meter NFPA 70E Arc-Flash Floor Perimeter Ring,
+ * and Volumetric Arc-Flash Plasma Particle Blast upon proximity breach.
  */
 @component
 export class ArcFlashSafetyShield extends BaseScriptComponent {
@@ -18,7 +19,14 @@ export class ArcFlashSafetyShield extends BaseScriptComponent {
     @input
     strobeLightObject: SceneObject;
 
+    @input
+    plasmaBlastObject: SceneObject;
+
+    @input
+    plasmaCrackleTrack: AudioTrackAsset;
+
     private _isStrobeActive: boolean = false;
+    private _isPlasmaActive: boolean = false;
     private _pulseTimer: number = 0;
     private _strobeTimer: number = 0;
     private _currentMode: PowerFlowMode = PowerFlowMode.LIVE_480V_RED;
@@ -39,11 +47,15 @@ export class ArcFlashSafetyShield extends BaseScriptComponent {
         return this._isStrobeActive;
     }
 
-    public getHazardCenter(): vec3 {
+    public get isPlasmaActive(): boolean {
+        return this._isPlasmaActive;
+    }
+
+    public getHazardCenter(): any {
         if (this.hazardCageObject) {
             return this.hazardCageObject.getTransform().getWorldPosition();
         }
-        return new vec3(0, 12, -85);
+        return new (globalThis as any).vec3(0, 12, -85);
     }
 
     /**
@@ -61,32 +73,44 @@ export class ArcFlashSafetyShield extends BaseScriptComponent {
             this.hazardLabelObject.enabled = active;
         }
         this._isStrobeActive = false;
+        this._isPlasmaActive = false;
     }
 
     /**
-     * Triggers the emergency proximity strobe when hand encroaches into the 15cm danger zone
+     * Triggers the emergency proximity strobe and volumetric arc-flash plasma blast
      */
     public triggerBreachStrobe(active: boolean): void {
         this._isStrobeActive = active;
+        this._isPlasmaActive = active && this._currentMode === PowerFlowMode.LIVE_480V_RED;
+
         if (this.strobeLightObject) {
             this.strobeLightObject.enabled = active;
+        }
+        if (this.plasmaBlastObject) {
+            this.plasmaBlastObject.enabled = this._isPlasmaActive;
+        }
+
+        if (this._isPlasmaActive && this.plasmaCrackleTrack) {
+            const audioComp = this.getSceneObject().createComponent("Component.AudioComponent");
+            audioComp.audioTrack = this.plasmaCrackleTrack;
+            audioComp.play(1);
         }
     }
 
     private onUpdate(): void {
-        const dt = getDeltaTime();
+        const dt = (globalThis as any).getDeltaTime ? (globalThis as any).getDeltaTime() : 0.016;
         this._pulseTimer += dt * 2.5;
 
         // Animate hazard cage pulsing
         if (this.hazardCageObject && this.hazardCageObject.enabled) {
             const scaleFactor = 1.0 + 0.03 * Math.sin(this._pulseTimer);
-            this.hazardCageObject.getTransform().setLocalScale(new vec3(scaleFactor, scaleFactor, scaleFactor));
+            this.hazardCageObject.getTransform().setLocalScale(new (globalThis as any).vec3(scaleFactor, scaleFactor, scaleFactor));
         }
 
         // Animate perimeter ring pulsation
         if (this.perimeterRingObject && this.perimeterRingObject.enabled) {
             const ringScale = 1.0 + 0.015 * Math.cos(this._pulseTimer * 0.8);
-            this.perimeterRingObject.getTransform().setLocalScale(new vec3(ringScale, 1.0, ringScale));
+            this.perimeterRingObject.getTransform().setLocalScale(new (globalThis as any).vec3(ringScale, 1.0, ringScale));
         }
 
         // Handle proximity breach strobe flashing

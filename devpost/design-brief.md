@@ -58,6 +58,8 @@ Each one can be checked in Lens Studio's preview:
 6. Hands-Free Voice Commands: Speaking (or triggering preview button for) "Check Status", "Toggle B2", and "Lockout Complete" transitions the state machine hands-free and triggers spatial audio confirmation cues.
 7. Dynamic Heatmap & Thermal Load Overlay: Internal wiring displays an amber-hot thermal gradient (68°C) under high electrical load and smoothly transitions to cold blue (21°C) upon breaker de-energizing.
 8. Gaze Dwell Verification Safety Interlock: In State 4, requires a continuous 1.5-second head-gaze lock on Terminal Pin T1 before Zero-Energy verification can be confirmed; a gaze radial fill ring visually animates the 1.5-second dwell countdown.
+9. Real-Time Spatial Object Detection Simulation: Displays a dynamic green tracking bounding box with a scanning grid overlay, successfully locking onto the target electrical cabinet with `TARGET: Panel #HV-402 [CONFIDENCE: 99.4%]`.
+10. 3D Exploded-View Architecture: Smoothly animates the cabinet front panel and busbar modules outward in 3D world space (offset +25cm / +15cm) to expose internal wiring and capacitors upon toggle or voice command "Explode View".
 
 ## Out of scope
 - Multi-user remote peer sharing (Connected Lenses).

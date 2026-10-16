@@ -1,7 +1,7 @@
 /**
  * run_leaf_tests.ts
  * Executes the complete LEAF automated test suite for VoltTwin AR v2.0.
- * Validates all 8 Done Criteria:
+ * Validates all 10 Done Criteria:
  *   LEAF-01: Spatial Twin Sync (Calibration & 90cm Anchor)
  *   LEAF-02: Live Arc-Flash Hazard & 15cm Hand Proximity Breach
  *   LEAF-03: Guided Mechanical Isolation (Breaker B2 Toggle & Residual Amber Flow)
@@ -10,6 +10,8 @@
  *   LEAF-06: Hands-Free Voice Commands ("Check Status", "Toggle B2", "Lockout Complete")
  *   LEAF-07: Dynamic Heatmap & Thermal Load Overlay (Amber-hot 68°C to Cold-blue 21°C)
  *   LEAF-08: Gaze Dwell Verification Safety Interlock (1.5s lock on T1)
+ *   LEAF-09: Real-Time Spatial Object Detection Simulation (99.4% confidence lock)
+ *   LEAF-10: 3D Exploded-View Architecture (+25cm / +15cm expansion)
  */
 
 import {
@@ -31,6 +33,9 @@ import { VoltTwinStateController } from "../src/VoltTwinStateController.ts";
 import { VoiceCommandDispatcher } from "../src/VoiceCommandDispatcher.ts";
 import { ThermalHeatmapOverlay } from "../src/ThermalHeatmapOverlay.ts";
 import { GazeDwellInterlock } from "../src/GazeDwellInterlock.ts";
+import { SpatialObjectDetection } from "../src/SpatialObjectDetection.ts";
+import { ExplodedViewController } from "../src/ExplodedViewController.ts";
+import { RemoteSupervisorTelemetry } from "../src/RemoteSupervisorTelemetry.ts";
 
 // Set up Scene Hierarchy
 const sceneObjects = new Map<string, MockSceneObject>();
@@ -56,6 +61,14 @@ function createScene(): LEAFContext {
     const gazeRadialRing = new MockSceneObject("GazeRadialRing");
     const terminalPinT1 = new MockSceneObject("TerminalPinT1");
 
+    // 3D Exploded View Objects
+    const frontDoor = new MockSceneObject("FrontDoor");
+    const busbarModule = new MockSceneObject("BusbarModule");
+    const terminalModule = new MockSceneObject("TerminalModule");
+
+    // CV Tracking Object
+    const cvTrackingBox = new MockSceneObject("CVTrackingBox");
+
     sceneObjects.set("PanelAnchor", panelAnchor);
     sceneObjects.set("LidarGrid", lidarGrid);
     sceneObjects.set("CalibrationPill", calibrationPill);
@@ -74,11 +87,18 @@ function createScene(): LEAFContext {
     sceneObjects.set("InstructionPill", instructionPill);
     sceneObjects.set("GazeRadialRing", gazeRadialRing);
     sceneObjects.set("TerminalPinT1", terminalPinT1);
+    sceneObjects.set("FrontDoor", frontDoor);
+    sceneObjects.set("BusbarModule", busbarModule);
+    sceneObjects.set("TerminalModule", terminalModule);
+    sceneObjects.set("CVTrackingBox", cvTrackingBox);
 
     // Initial transforms
     panelAnchor.getTransform().setWorldPosition(new MockVec3(0, 0, 0));
+    frontDoor.getTransform().setWorldPosition(new MockVec3(0, 0, 0));
+    busbarModule.getTransform().setWorldPosition(new MockVec3(0, 18, 14));
+    terminalModule.getTransform().setWorldPosition(new MockVec3(14, -14, 14));
     hazardCage.getTransform().setWorldPosition(new MockVec3(0, 12, -85));
-    handTrackingAnchor.getTransform().setWorldPosition(new MockVec3(50, 0, -50)); // Safely away initially
+    handTrackingAnchor.getTransform().setWorldPosition(new MockVec3(50, 0, -50));
     terminalPinT1.getTransform().setWorldPosition(new MockVec3(14, -18, -85));
 
     // Instantiate Subsystems
@@ -93,6 +113,7 @@ function createScene(): LEAFContext {
     safetyShield.perimeterRingObject = perimeterRing as any;
     safetyShield.hazardLabelObject = hazardLabel as any;
     safetyShield.strobeLightObject = strobeLight as any;
+    safetyShield.plasmaBlastObject = new MockSceneObject("PlasmaBlast") as any;
     safetyShield.onAwake();
 
     const proximitySensor = new ProximitySensor();
@@ -131,6 +152,22 @@ function createScene(): LEAFContext {
     panelHardware.breakerB2SwitchObject = breakerB2Switch as any;
     panelHardware.onAwake();
 
+    const objectDetection = new SpatialObjectDetection();
+    objectDetection.trackingBoxObject = cvTrackingBox as any;
+    objectDetection.hudTextComponent = { text: "" } as any;
+    objectDetection.onAwake();
+
+    const explodedController = new ExplodedViewController();
+    explodedController.frontDoorObject = frontDoor as any;
+    explodedController.busbarModuleObject = busbarModule as any;
+    explodedController.terminalModuleObject = terminalModule as any;
+    explodedController.onAwake();
+
+    const remoteSupervisor = new RemoteSupervisorTelemetry();
+    remoteSupervisor.supervisorNameText = { text: "" } as any;
+    remoteSupervisor.linkStatusText = { text: "" } as any;
+    remoteSupervisor.onAwake();
+
     const stateController = new VoltTwinStateController();
     stateController.spatialCalibration = spatialCalibration;
     stateController.safetyShield = safetyShield;
@@ -141,6 +178,9 @@ function createScene(): LEAFContext {
     stateController.panelHardware = panelHardware;
     stateController.thermalOverlay = thermalOverlay;
     stateController.gazeInterlock = gazeInterlock;
+    stateController.objectDetection = objectDetection;
+    stateController.explodedController = explodedController;
+    stateController.remoteSupervisor = remoteSupervisor;
     stateController.stateInstructionPill = instructionPill as any;
     stateController.stateInstructionText = { text: "" } as any;
     stateController.onAwake();
@@ -148,6 +188,7 @@ function createScene(): LEAFContext {
     const voiceDispatcher = new VoiceCommandDispatcher();
     voiceDispatcher.stateController = stateController;
     voiceDispatcher.panelHardware = panelHardware;
+    voiceDispatcher.explodedController = explodedController;
     voiceDispatcher.onAwake();
 
     components.set("SpatialCalibration", spatialCalibration);
@@ -159,6 +200,9 @@ function createScene(): LEAFContext {
     components.set("GhostProbeVerifier", ghostProbeVerifier);
     components.set("CryptographicTagout", cryptographicTagout);
     components.set("SimulatedPanelHardware", panelHardware);
+    components.set("SpatialObjectDetection", objectDetection);
+    components.set("ExplodedViewController", explodedController);
+    components.set("RemoteSupervisorTelemetry", remoteSupervisor);
     components.set("VoltTwinStateController", stateController);
     components.set("VoiceCommandDispatcher", voiceDispatcher);
 
@@ -173,7 +217,7 @@ function createScene(): LEAFContext {
                     panelHardware.toggleBreakerB2();
                     if (!panelHardware.isBreakerB2Closed) {
                         powerFlowXRay.setMode(PowerFlowMode.RESIDUAL_AMBER);
-                        thermalOverlay.setElectricalLoad(180.0, true);
+                        thermalOverlay.setElectricalLoad(180.0, true, true);
                     }
                 }
             },
@@ -189,6 +233,8 @@ function createScene(): LEAFContext {
                 (ghostProbeVerifier as any).triggerEvent("UpdateEvent");
                 (thermalOverlay as any).triggerEvent("UpdateEvent");
                 (gazeInterlock as any).triggerEvent("UpdateEvent");
+                (objectDetection as any).triggerEvent("UpdateEvent");
+                (explodedController as any).triggerEvent("UpdateEvent");
             }
         }
     };
@@ -243,6 +289,7 @@ async function runAllTests() {
 
             leaf.expect(proximity.isBreached).toBe(true);
             leaf.expect(shield.isStrobeActive).toBe(true);
+            leaf.expect(shield.isPlasmaActive).toBe(true);
         });
     });
 
@@ -358,6 +405,43 @@ async function runAllTests() {
         });
     });
 
+    // LEAF-09: Real-Time Spatial Object Detection Simulation
+    leaf.describe("LEAF-09: Spatial Object Detection Lock", () => {
+        leaf.it("LEAF-09: Spatial Object Detection Simulation (99.4% confidence lock on Panel #HV-402)", async (ctx) => {
+            const objectDetection = ctx.findComponent("SpatialObjectDetection");
+
+            objectDetection.startScan();
+            leaf.expect(objectDetection.isLocked).toBe(false);
+            leaf.expect(objectDetection.confidenceScore).toBe(0.0);
+
+            // Simulate CV processing duration (1.5s)
+            await ctx.wait(1500);
+            leaf.expect(objectDetection.isLocked).toBe(true);
+            leaf.expect(objectDetection.confidenceScore).toBeCloseTo(0.994, 0.005);
+            leaf.expect(objectDetection.hudStatusText).toContain("CONFIDENCE: 99.4%");
+        });
+    });
+
+    // LEAF-10: 3D Exploded-View Architecture
+    leaf.describe("LEAF-10: Exploded 3D View Animation", () => {
+        leaf.it("LEAF-10: 3D Exploded-View Architecture (+25cm / +15cm expansion of cabinet modules)", async (ctx) => {
+            const explodedController = ctx.findComponent("ExplodedViewController");
+            const frontDoor = ctx.findSceneObject("FrontDoor");
+
+            leaf.expect(explodedController.isExploded).toBe(false);
+            leaf.expect(explodedController.explosionProgress).toBe(0.0);
+
+            explodedController.setExploded(true);
+            leaf.expect(explodedController.isExploded).toBe(true);
+
+            // Wait for smooth lerp expansion
+            await ctx.wait(1000);
+            leaf.expect(explodedController.explosionProgress).toBeCloseTo(1.0, 0.05);
+            const doorPos = frontDoor.getTransform().getWorldPosition();
+            leaf.expect(doorPos.z).toBeCloseTo(25.0, 2.0); // +25cm outward
+        });
+    });
+
     // Execute Tests
     let passCount = 0;
     let failCount = 0;
@@ -378,7 +462,7 @@ async function runAllTests() {
     console.log("--------------------------------------------------------------------------------");
 
     if (failCount === 0) {
-        console.log("🎉 ALL 8 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
+        console.log("🎉 ALL 10 DONE CRITERIA AUTOMATED LEAF TESTS PASSED SUCCESSFULLY!");
     } else {
         process.exit(1);
     }
