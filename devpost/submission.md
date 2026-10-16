@@ -82,3 +82,25 @@ Designing for optical see-through AR glasses requires fundamentally different th
 * **Thermal Camera Hardware Integration:** Integrating FLIR Lepton thermal camera micro-modules via SPECS sidecar API.
 * **Enterprise ERP Integration:** Live two-way synchronization with SAP Plant Maintenance and IBM Maximo for automated cryptographic work-order sign-offs.
 * **Connected Lenses Multi-User Inspection:** Allowing remote safety supervisors to observe the technician's point of view in real time and co-sign digital padlocks.
+
+---
+
+### 🎬 Official Devpost Demo Video (`demo-submission.mp4`)
+* **Format:** 1920x1080 (1080p), 60 FPS, H.264 High Profile, AAC Stereo.
+* **Duration:** Exactly 02:35 (155.0 seconds).
+* **Audio Track:** Full binaural soundtrack with Windows SAPI neural-cadence narration, 60Hz/120Hz transformer hum with acoustic occlusion filtering, volumetric plasma arc crackle burst, and padlock latch chime.
+* **High-Resolution Thumbnails:**
+  * `thumbnail_exploded.jpg` (Frame 01:22): 3D Exploded-View exposing internal busbars and $68^\circ\text{C}$ amber conduits.
+  * `thumbnail_tagout.jpg` (Frame 02:00): Emerald LOTO compliance state with glowing padlock and `LOTO-HASH-994A` tag.
+
+#### Exact Video Sequence & Narration Breakdown:
+| Timestamp | Sequence | Narration Focus & Actions |
+| :--- | :--- | :--- |
+| `0:00 - 0:25` | **Hook & Waveguide Thesis** | Optical see-through thesis: sharing view, 1:1 scale, hands-free. WebGL viewport initializes with 1m Arc-Flash perimeter ring. |
+| `0:25 - 0:50` | **Core Stack (CLAD + Lens Studio MCP + TS)** | Architecture overview: deterministic FSM, SIK integration, NFPA 70E compliance calculations, waveguide additive color rules. |
+| `0:50 - 1:15` | **Three.js Engine & Hazard Breach** | Optical CV tracking lock on HV-402 (99.4% confidence). Hand proximity slider breaches 15cm; triggers crimson strobe warning and volumetric plasma spark particle blast. |
+| `0:15 - 1:40` | **3D Exploded-View & Web Audio Occlusion** | Voice command *"Explode View"* smoothly expands cabinet modules (+25cm); exposes $68^\circ\text{C}$ thermal load conduits; dynamic biquad audio filter unmasks 60Hz transformer hum (-12dB to 0dB). |
+| `1:40 - 2:05` | **Hands-Free LOTO & Gaze-Dwell Interlock** | Voice command *"Toggle B2"* isolates circuit; thermal conduits cool to $21^\circ\text{C}$ cryo-blue; 1.5s gaze-dwell reticle locks on Terminal T1 (0.0V verified); 3D digital padlock latches with metallic chime. |
+| `2:05 - 2:25` | **LEAF 12/12 Verification & Audit Log Export** | Viewport pans down across the 12 automated LEAF test badges (100% passing); triggers HUD click to export cryptographic JSON audit report (`LOTO-HASH-994A.json`). |
+| `2:25 - 2:35` | **Heroic Sign-off & 3D Spatial Orbit** | Dramatic camera orbit around safe emerald-green cabinet; closing call to action for Snap SPECS spatial computing in industrial safety. |
+
